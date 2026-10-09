@@ -118,13 +118,20 @@ def post(u, body):
     except Exception:
         return None
 
+def retry(f, *a):
+    for k in range(3):  # Workday throttles bursts from shared CI runners; back off and retry
+        r = f(*a)
+        if r is not None: return r
+        __import__("time").sleep(2 * (k + 1))
+    return None
+
 def wd(entry):
     name, ten, n, site = entry
     base = f"https://{ten}.wd{n}.myworkdayjobs.com/wday/cxs/{ten}/{site}"
     paths = {}
     for term in WD_TERMS:
         for off in range(0, 100, 20):
-            d = post(base + "/jobs", {"appliedFacets": {}, "limit": 20, "offset": off, "searchText": term})
+            d = retry(post, base + "/jobs", {"appliedFacets": {}, "limit": 20, "offset": off, "searchText": term})
             posts = (d or {}).get("jobPostings") or []
             for p in posts:
                 t, lt = p.get("title", ""), p.get("locationsText", "")
@@ -133,7 +140,7 @@ def wd(entry):
             if len(posts) < 20: break
     out = []
     for path in list(paths)[:120]:
-        d = get(base + path) if path else None
+        d = retry(get, base + path) if path else None
         i = (d or {}).get("jobPostingInfo") or {}
         if not i: continue
         cc = ((i.get("jobRequisitionLocation") or {}).get("country") or {}).get("alpha2Code", "")
@@ -228,7 +235,9 @@ def score(j):
 
 def main():
     with cf.ThreadPoolExecutor(24) as ex:
-        raw = [x for lst in list(ex.map(gh, GH)) + list(ex.map(ash, ASH)) + list(ex.map(lev, LEV)) + list(ex.map(wd, WD)) + list(ex.map(sr, SR)) for x in lst]
+        raw = [x for lst in list(ex.map(gh, GH)) + list(ex.map(ash, ASH)) + list(ex.map(lev, LEV)) + list(ex.map(sr, SR)) for x in lst]
+    with cf.ThreadPoolExecutor(6) as ex:  # fewer parallel Workday sites to avoid throttling
+        raw += [x for lst in ex.map(wd, WD) for x in lst]
     if not raw:
         sys.exit("No jobs fetched; keeping the previous dashboard.")
     prev = set()
