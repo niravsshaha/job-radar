@@ -202,9 +202,10 @@ aside{display:flex;flex-direction:column;gap:16px}
   </div>
 </div>
 
+<script src="live.js"></script>
 <script src="applied.js"></script>
 <script>
-const JOBS = __DATA__;
+const JOBS = (function(d){ return window.liveJobs ? window.liveJobs(d) : d; })(__DATA__);
 const EXTRA_APPS = window.EXTRA_APPS || [];
 const GMAIL_APPS = [{"company": "Quantiphi", "title": "Senior Data Engineer", "at": "2026-10-08T15:22:00-05:00", "status": "Screening"}, {"company": "Figma", "title": "Data Scientist", "at": "2026-10-08T17:10:00-05:00", "status": "Applied"}, {"company": "Figma", "title": "Data Scientist, Finance", "at": "2026-10-08T17:11:00-05:00", "status": "Applied"}, {"company": "Gopuff", "title": "Analytics Engineer", "at": "2026-10-08T16:48:00-05:00", "status": "Applied"}, {"company": "Celigo", "title": "Data Engineer", "at": "2026-10-08T16:16:00-05:00", "status": "Applied"}, {"company": "Glean", "title": "Software Engineer (several roles)", "at": "2026-10-08T14:10:00-05:00", "status": "Applied"}, {"company": "Atoms", "title": "Role not named in email", "at": "2026-10-08T13:35:00-05:00", "status": "Applied"}, {"company": "Strava", "title": "Senior Data Engineer", "at": "2026-10-08T13:25:00-05:00", "status": "Applied"}, {"company": "DoorDash", "title": "Software Engineer, Data and AI Platform", "at": "2026-10-08T12:21:00-05:00", "status": "Applied"}, {"company": "PlayStation Global", "title": "Software Engineer II, Java", "at": "2026-10-08T12:12:00-05:00", "status": "Applied"}, {"company": "Charles Schwab", "title": "Data Engineer (2026-126919)", "at": "2026-10-07T17:33:00-05:00", "status": "Applied"}, {"company": "Mastercard", "title": "Role not named in email", "at": "2026-10-07T16:49:00-05:00", "status": "Applied"}, {"company": "Walmart", "title": "4 applications, roles not named in email", "at": "2026-10-07T16:35:00-05:00", "status": "Applied"}, {"company": "IBM", "title": "Data Engineer, Data Platforms (Google) 5", "at": "2026-10-07T16:30:00-05:00", "status": "Applied"}, {"company": "IBM", "title": "Data Engineer, Data Platforms (Google) 3", "at": "2026-10-07T16:30:00-05:00", "status": "Applied"}, {"company": "IBM", "title": "Data Engineer, Data Platforms (Google) 1", "at": "2026-10-07T16:25:00-05:00", "status": "Applied"}, {"company": "IBM", "title": "Data Engineer, Data Platforms (Google) 4", "at": "2026-10-07T16:20:00-05:00", "status": "Applied"}];
 const APPLIED_COS = ["Figma","DoorDash","Quantiphi","Gopuff","Celigo","Glean","Atoms","Strava","PlayStation","Schwab","Mastercard","Walmart","IBM"];
@@ -402,3 +403,4 @@ $("#copyGh").addEventListener("click", ()=>{
 <script src="cofilter.js"></script>
 <script src="applyprompt.js"></script>
 <script src="titlefilter.js"></script>
+<script src="refresh.js"></script>
