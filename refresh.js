@@ -126,6 +126,12 @@
         if (seen.has(k) || o.score < MIN_SCORE) return;
         seen.add(k); o.isNew = !prev.has(o.url); out.push(o);
       });
+      JOBS.forEach(function(j){
+        if (j.src !== "wd" && j.src !== "sr") return;
+        var k = j.company + "|" + j.title + "|" + j.loc;
+        if (!seen.has(k)) { seen.add(k); out.push(Object.assign({}, j, {isNew: false})); }
+      });
+      out.sort(function(a, b){ return b.score - a.score; });
       if (!out.length) throw new Error("no matches");
       var added = out.filter(function(o){ return o.isNew; }).length;
       try { localStorage.setItem("radarLive", JSON.stringify({at: Date.now(), jobs: out})); }
