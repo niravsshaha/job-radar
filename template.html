@@ -128,7 +128,7 @@ aside{display:flex;flex-direction:column;gap:16px}
         <select id="level" aria-label="Level">
           <option value="">All levels</option><option>Mid</option><option>Senior</option><option>Staff+</option>
         </select>
-        <select id="company" aria-label="Company"><option value="">All companies</option></select>
+        <div class="cofilter" id="coFilter"><button type="button" class="cobtn" id="coBtn" aria-haspopup="true" aria-expanded="false">All companies</button><div class="copanel" id="coPanel" hidden><input type="search" id="coSearch" placeholder="Find a company" aria-label="Find a company"><div class="coacts"><button type="button" class="btn" id="coAll">Select all</button><button type="button" class="btn" id="coNone">Clear</button></div><div class="colist" id="coList"></div></div></div>
         <select id="sort" aria-label="Sort">
           <option value="score">Best fit</option><option value="posted">Newest</option><option value="company">Company A–Z</option>
         </select>
@@ -223,7 +223,7 @@ function color(s){ return s>=85 ? "var(--good)" : s>=75 ? "var(--accent)" : "var
 function esc(s){ return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
 function filtered(){
-  const q = $("#q").value.trim().toLowerCase(), lvl = $("#level").value, co = $("#company").value, rem = $("#remote").checked, bq = $("#bq").checked;
+  const q = $("#q").value.trim().toLowerCase(), lvl = $("#level").value, co = (typeof coSel==="function" ? coSel() : null), rem = $("#remote").checked, bq = $("#bq").checked;
   let r = JOBS.filter(j=>{
     if (view==="hidden") { if (!state.hidden[j.id]) return false; }
     else if (view==="all" && state.applied[j.id]) return false;
@@ -231,7 +231,7 @@ function filtered(){
     if (view==="saved" && !state.saved[j.id]) return false;
     if (view==="applied" && !state.applied[j.id]) return false;
     if (lvl && j.level!==lvl) return false;
-    if (co && j.company!==co) return false;
+    if (co && !co.has(j.company)) return false;
     if (rem && !j.remote) return false;
     if (bq && !j.match.some(m=>m==="BigQuery"||m==="GCP")) return false;
     if (q && !(j.title+" "+j.company+" "+j.loc+" "+j.match.join(" ")+" "+j.gaps.join(" ")).toLowerCase().includes(q)) return false;
@@ -272,8 +272,8 @@ function render(){
       ...EXTRA_APPS.filter(a=>!JOBS.some(j=>j.url===a.url) && (!q || (a.company+" "+a.title).toLowerCase().includes(q))).map(a=>({...a,src:"Dashboard",ms:Date.parse(a.at)})),
       ...GMAIL_APPS.filter(a=>!q || (a.company+" "+a.title).toLowerCase().includes(q)).map(a=>({...a,src:"Gmail",ms:Date.parse(a.at)}))
     ];
-    const coSel = $("#company").value;
-    if (coSel) items.splice(0, items.length, ...items.filter(i=>i.company===coSel));
+    const coS = (typeof coSel==="function" ? coSel() : null);
+    if (coS) items.splice(0, items.length, ...items.filter(i=>coS.has(i.company)));
     const groups = {};
     items.forEach(it=>{ (groups[it.company] = groups[it.company] || []).push(it); });
     const ts = i=> i.ms || 0;
@@ -347,13 +347,7 @@ document.addEventListener("click", e=>{
   if (rm){ const id = rm.dataset.rm, gone = state.manual.find(m=>m.mid===id); state.manual = state.manual.filter(m=>m.mid!==id); persist(); render();
     toast(`Removed ${gone?gone.company:"job"}`, ()=>{ if (gone){ state.manual.push(gone); persist(); render(); } }); }
 });
-["q","level","sort","remote","bq","appSort","company"].forEach(id=>$("#"+id).addEventListener("input",render));
-(function fillCompanies(){
-  const cnt = {};
-  JOBS.forEach(j=>{ cnt[j.company] = (cnt[j.company]||0) + 1; });
-  [...GMAIL_APPS, ...EXTRA_APPS, ...(state.manual||[])].forEach(a=>{ if (!(a.company in cnt)) cnt[a.company] = 0; });
-  $("#company").insertAdjacentHTML("beforeend", Object.keys(cnt).sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:"base"})).map(c=>'<option value="'+esc(c)+'">'+esc(c)+(cnt[c]?' ('+cnt[c]+')':'')+'</option>').join(""));
-})();
+["q","level","sort","remote","bq","appSort"].forEach(id=>$("#"+id).addEventListener("input",render));
 bars(); render(); dashPanel();
 function guessCompany(u){
   try {
@@ -393,3 +387,4 @@ $("#copyLi").addEventListener("click", ()=>{
   try { navigator.clipboard.writeText(url).then(done, fallback); } catch(e){ fallback(); }
 });
 </script>
+<script src="cofilter.js"></script>
