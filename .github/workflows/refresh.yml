@@ -1,0 +1,26 @@
+name: Refresh job radar
+on:
+  schedule:
+    - cron: "0 12 * * *"   # 7:00 AM Central (12:00 UTC) every day
+  workflow_dispatch: {}      # run it by hand from the Actions tab
+  push:
+    paths: ["radar.py", "template.html"]
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Rebuild dashboard
+        run: python3 radar.py
+      - name: Commit if changed
+        run: |
+          git config user.name "job-radar-bot"
+          git config user.email "job-radar-bot@users.noreply.github.com"
+          git add index.html jobs.json
+          git diff --cached --quiet || git commit -m "Daily job refresh $(date -u +%F)"
+          git push
