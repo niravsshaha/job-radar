@@ -386,11 +386,11 @@ $("#copyLi").addEventListener("click", ()=>{
   const fallback = ()=>{ const r = document.createRange(); r.selectNodeContents($("#liUrl")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = "Press Ctrl/Cmd+C"; setTimeout(()=>btn.textContent = "Copy", 2500); };
   try { navigator.clipboard.writeText(url).then(done, fallback); } catch(e){ fallback(); }
 });
-</script>
-<script src="cofilter.js">$("#copyPf").addEventListener("click", ()=>{
+$("#copyPf").addEventListener("click", ()=>{
   const url = $("#pfUrl").textContent, btn = $("#copyPf");
   const done = ()=>{ btn.textContent = "Copied"; setTimeout(()=>btn.textContent = "Copy", 1800); };
   const fallback = ()=>{ const r = document.createRange(); r.selectNodeContents($("#pfUrl")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = "Press Ctrl/Cmd+C"; setTimeout(()=>btn.textContent = "Copy", 2500); };
   try { navigator.clipboard.writeText(url).then(done, fallback); } catch(e){ fallback(); }
 });
 </script>
+<script src="cofilter.js"></script>
