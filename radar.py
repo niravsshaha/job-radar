@@ -30,7 +30,7 @@ def gh(c):
         if TITLE.search(t) and not EXCL.search(t):
             loc = (j.get('location') or {}).get('name', '')
             offs = '; '.join(o.get('name', '') for o in (j.get('offices') or []) if o.get('name'))
-            if offs and (VAGUE.match(loc) or not USPLACE.search(loc)): loc = offs
+            if offs and (VAGUE.match(loc) or not (USPLACE.search(loc) or NONUS.search(loc))): loc = offs
             out.append(dict(company=c, title=t, loc=loc, url=j['absolute_url'],
                             updated=j.get('updated_at', ''), desc=html.unescape(j.get('content', '')), comp='', remote=None))
     return out
@@ -50,6 +50,7 @@ US = re.compile(r'united states|usa|\bus\b|u\.s\.|remote|new york|san francisco|
 # US-only filter: a role is kept only when its location names a US place or state.
 USPLACE = re.compile(r'united states|usa|u\.s\.|\bus\b|new york|nyc|san francisco|bay area|seattle|austin|chicago|boston|denver|atlanta|dallas|houston|los angeles|california|texas|mountain view|palo alto|menlo park|sunnyvale|san jose|san mateo|oakland|portland|miami|pittsburgh|philadelphia|salt lake|bellevue|raleigh|minneapolis|nashville|washington, dc|colorado springs|omaha|st\. louis', re.I)
 USSTATE = re.compile(r',\s*(AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY)\b')
+RESIDE = re.compile(r'(?:residing|resident|located|based|living|reside|work)\s+(?:in|within|from)\s+(?:the\s+)?([A-Za-z ,]{3,60})', re.I)
 VAGUE = re.compile(r'^\s*(in-office|hybrid|remote|on-?site|office|flexible)?\s*$', re.I)
 NONUS = re.compile(r'london|uk\b|united kingdom|india|bengaluru|bangalore|hyderabad|pune|dublin|ireland|toronto|canada|vancouver|berlin|germany|paris|amsterdam|singapore|tokyo|sydney|australia|brazil|mexico|poland|warsaw|spain|madrid|tel aviv|israel|lisbon|portugal|emea|apac|latam|europe|japan|korea|seoul|philippines|argentina|colombia|costa rica|czech|romania|netherlands', re.I)
 
@@ -73,6 +74,8 @@ def score(j):
     d = strip(j.get('desc', ''))
     if NONUS.search(loc) and not USPLACE.search(loc): return None
     if not (USPLACE.search(loc) or USSTATE.search(loc)): return None
+    for m in RESIDE.finditer(d[:4000]):  # e.g. 'open to candidates residing in Canada'
+        if NONUS.search(m.group(1)) and not USPLACE.search(m.group(1)): return None
     if SKIP_TITLE.search(j['title']): return None
     text = j['title'] + ' ' + d
     match, gap, tot, got = [], [], 0, 0
