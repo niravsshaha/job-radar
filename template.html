@@ -125,6 +125,7 @@ aside{display:flex;flex-direction:column;gap:16px}
     <main style="display:flex;flex-direction:column;gap:12px;min-width:0">
       <div class="filters">
         <input type="search" id="q" placeholder="Search title, company, skill…" aria-label="Search">
+        <select id="minScore" aria-label="Minimum fit score"><option value="0">Any fit</option><option value="60">60+ fit</option><option value="70">70+ fit</option><option value="80">80+ fit</option><option value="85">85+ fit</option><option value="90">90+ fit</option></select>
         <select id="level" aria-label="Level">
           <option value="">All levels</option><option>Mid</option><option>Senior</option><option>Staff+</option>
         </select>
@@ -135,6 +136,7 @@ aside{display:flex;flex-direction:column;gap:16px}
         <label class="chk"><input type="checkbox" id="remote"> Remote only</label>
         <label class="chk"><input type="checkbox" id="bq"> Uses BigQuery/GCP</label>
       </div>
+      <div id="exFilter"></div>
       <div class="tabs" role="group" aria-label="View">
         <button class="tab" data-view="all" aria-pressed="true">All</button>
         <button class="tab" data-view="saved" aria-pressed="false">Saved</button>
@@ -223,7 +225,7 @@ function color(s){ return s>=85 ? "var(--good)" : s>=75 ? "var(--accent)" : "var
 function esc(s){ return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
 function filtered(){
-  const q = $("#q").value.trim().toLowerCase(), lvl = $("#level").value, co = (typeof coSel==="function" ? coSel() : null), rem = $("#remote").checked, bq = $("#bq").checked;
+  const q = $("#q").value.trim().toLowerCase(), lvl = $("#level").value, ms = +($("#minScore").value || 0), co = (typeof coSel==="function" ? coSel() : null), rem = $("#remote").checked, bq = $("#bq").checked;
   let r = JOBS.filter(j=>{
     if (view==="hidden") { if (!state.hidden[j.id]) return false; }
     else if (view==="all" && state.applied[j.id]) return false;
@@ -231,6 +233,8 @@ function filtered(){
     if (view==="saved" && !state.saved[j.id]) return false;
     if (view==="applied" && !state.applied[j.id]) return false;
     if (lvl && j.level!==lvl) return false;
+    if (ms && j.score < ms) return false;
+    if (typeof titleHidden === "function" && titleHidden(j.title)) return false;
     if (co && !co.has(j.company)) return false;
     if (rem && !j.remote) return false;
     if (bq && !j.match.some(m=>m==="BigQuery"||m==="GCP")) return false;
@@ -343,7 +347,7 @@ document.addEventListener("click", e=>{
   if (rm){ const id = rm.dataset.rm, gone = state.manual.find(m=>m.mid===id); state.manual = state.manual.filter(m=>m.mid!==id); persist(); render();
     toast(`Removed ${gone?gone.company:"job"}`, ()=>{ if (gone){ state.manual.push(gone); persist(); render(); } }); }
 });
-["q","level","sort","remote","bq","appSort"].forEach(id=>$("#"+id).addEventListener("input",render));
+["q","level","sort","remote","bq","appSort","minScore"].forEach(id=>$("#"+id).addEventListener("input",render));
 bars(); render(); dashPanel();
 function guessCompany(u){
   try {
@@ -397,3 +401,4 @@ $("#copyGh").addEventListener("click", ()=>{
 </script>
 <script src="cofilter.js"></script>
 <script src="applyprompt.js"></script>
+<script src="titlefilter.js"></script>

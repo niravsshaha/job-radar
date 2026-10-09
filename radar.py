@@ -7,13 +7,15 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 P = lambda f: os.path.join(HERE, f)
 
 # Companies to search. Greenhouse board slugs and Ashby board slugs.
-GH = """figma databricks stripe airbnb dropbox pinterest reddit discord robinhood coinbase instacart lyft doordashusa gitlab datadog cloudflare mongodb elastic twilio okta samsara brex affirm chime gusto asana airtable squarespace roblox duolingo fivetran starburst anthropic scaleai faire nextdoor vercel webflow mercury block toast zscaler yext carta flexport checkr sofi sigmacomputing monzo cockroachlabs singlestore dagsterlabs pagerduty newrelic launchdarkly mixpanel braze iterable lattice oscar calm peloton tripadvisor waymo nuro gemini ripple prizepicks""".split()
-ASH = """notion ramp openai linear plaid confluent snowflake vanta deel cohere perplexity replit supabase posthog sentry modal anyscale harvey runway character pinecone watershed""".split()
+GH = """adyen affirm airbnb airtable alphasights anthropic applovin asana attentive block braze brex calm carta checkr chime cloudflare cockroachlabs coinbase coupang coursera current databricks datadog discord doordashusa dropbox duolingo elastic epicgames faire fastly figma fivetran flatironhealth flexport gemini gitlab grafanalabs gusto hellofresh instacart justworks klaviyo labelbox lattice launchdarkly lucidmotors lyft medium mercury mixpanel mongodb monzo neo4j netlify newrelic nextdoor nuro okta onemedical oscar oura pagerduty peloton pinterest prizepicks purestorage reddit riotgames ripple robinhood roblox rubrik samsara scaleai scopely sigmacomputing singlestore smartsheet snorkelai sofi squarespace stabilityai starburst stripe toast tripadvisor twilio twitch udemy underdog upstart vercel waymo webflow yext zocdoc zscaler""".split()
+ASH = """airbyte anyscale ashby benchling character cohere confluent cursor docker elevenlabs harvey hex hightouch linear materialize modal motherduck neon notion openai perplexity pinecone plaid posthog railway ramp render replit runway sentry snowflake supabase temporal vanta warp watershed zapier""".split()
+LEV = """binance outreach palantir ro spotify zoox""".split()
 
 UA = {'User-Agent': 'Mozilla/5.0'}
-TITLE = re.compile(r'data (engineer|infrastructure|platform)|analytics engineer|(engineer|swe).{0,25}data|data.{0,20}(pipeline|warehouse)|big data|etl', re.I)
+TITLE = re.compile(r'data|analytics|etl|elt|pipeline|warehouse|lakehouse|business intelligence|\bbi\b|ml platform|ml infra|machine learning (platform|infra)|backend|back-end|software engineer|platform engineer|infrastructure engineer', re.I)
 EXCL = re.compile(r'manager|director|head of|vp|principal|intern|scientist|analyst|sales|account|solutions|customer|support|recruit|counsel|marketing|product manager|designer', re.I)
 SKIP_TITLE = re.compile(r'product management|network|machine learning engineer|research engineer|field engineer|security|hardware|full-stack|frontend', re.I)
+MIN_SCORE = 40  # roles below this fit score are dropped; the page has its own fit filter
 NAMES = {'doordashusa': 'DoorDash', 'scaleai': 'Scale AI', 'openai': 'OpenAI', 'sigmacomputing': 'Sigma Computing', 'prizepicks': 'PrizePicks', 'gitlab': 'GitLab', 'mongodb': 'MongoDB'}
 
 def get(u):
@@ -33,6 +35,21 @@ def gh(c):
             if offs and (VAGUE.match(loc) or not (USPLACE.search(loc) or NONUS.search(loc))): loc = offs
             out.append(dict(company=c, title=t, loc=loc, url=j['absolute_url'],
                             updated=j.get('updated_at', ''), desc=html.unescape(j.get('content', '')), comp='', remote=None))
+    return out
+
+def lev(c):
+    d = get(f"https://api.lever.co/v0/postings/{c}?mode=json")
+    out = []
+    for j in (d if isinstance(d, list) else []):
+        t = j.get('text', '')
+        if TITLE.search(t) and not EXCL.search(t):
+            cat = j.get('categories') or {}
+            locs = cat.get('allLocations') or [cat.get('location', '')]
+            sal = j.get('salaryRange') or {}
+            comp = f"${sal['min']:,} \u2013 ${sal['max']:,}" if sal.get('min') and sal.get('max') else ''
+            out.append(dict(company=c, title=t, loc='; '.join(x for x in locs if x), url=j.get('hostedUrl', ''),
+                            updated='', desc=(j.get('descriptionPlain') or '') + ' ' + (j.get('additionalPlain') or ''), comp=comp,
+                            remote=(j.get('workplaceType') == 'remote')))
     return out
 
 def ash(c):
@@ -103,7 +120,7 @@ def score(j):
 
 def main():
     with cf.ThreadPoolExecutor(24) as ex:
-        raw = [x for lst in list(ex.map(gh, GH)) + list(ex.map(ash, ASH)) for x in lst]
+        raw = [x for lst in list(ex.map(gh, GH)) + list(ex.map(ash, ASH)) + list(ex.map(lev, LEV)) for x in lst]
     if not raw:
         sys.exit("No jobs fetched; keeping the previous dashboard.")
     prev = set()
@@ -113,7 +130,7 @@ def main():
     seen, out = set(), []
     for o in sorted(filter(None, map(score, raw)), key=lambda x: -x['score']):
         k = (o['company'], o['title'], o['loc'])
-        if k in seen or o['score'] < 65: continue
+        if k in seen or o['score'] < MIN_SCORE: continue
         seen.add(k)
         o['isNew'] = bool(prev) and o['url'] not in prev
         out.append(o)
