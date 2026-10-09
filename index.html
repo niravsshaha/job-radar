@@ -1,0 +1,380 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0;font:14px/1.5 system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Nirav's Job Radar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: header + stat strip, then two columns — ranked job list (main) and insight rail (side); stacks on phones */
+:root{
+  --bg:#f4f6f8; --surface:#ffffff; --surface-2:#eef2f5; --line:#d9e0e6;
+  --fg:#15202b; --muted:#5b6b7a; --accent:#0b6e8a; --accent-soft:#dcedf2;
+  --good:#1f7a4d; --good-soft:#dff2e7; --warn:#a15c00; --warn-soft:#fbecd6; --bad:#a3323a;
+  --f-display:"Schibsted Grotesk",system-ui,sans-serif; --f-body:"Public Sans",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f161c; --surface:#16212a; --surface-2:#1c2a35; --line:#2a3a47;
+  --fg:#e4ebf0; --muted:#93a4b3; --accent:#4fb8d6; --accent-soft:#163543;
+  --good:#5fcf95; --good-soft:#163a2a; --warn:#f0b35c; --warn-soft:#3d2c12; --bad:#f08a90; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f161c; --surface:#16212a; --surface-2:#1c2a35; --line:#2a3a47;
+  --fg:#e4ebf0; --muted:#93a4b3; --accent:#4fb8d6; --accent-soft:#163543;
+  --good:#5fcf95; --good-soft:#163a2a; --warn:#f0b35c; --warn-soft:#3d2c12; --bad:#f08a90; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:28px 60px;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;align-items:flex-end}
+header h1{font-size:30px;font-weight:800;letter-spacing:-.01em}
+header p{margin:4px 0 0;color:var(--muted);max-width:62ch}
+.stamp{font-family:var(--f-mono);font-size:12px;color:var(--muted);text-align:right}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.stat b{display:block;font-family:var(--f-display);font-size:26px;font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:22px;align-items:start}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px}
+.filters input[type=search]{flex:1 1 220px;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
+select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
+label.chk{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:13px;cursor:pointer}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:6px 12px;border-radius:999px;font:inherit;font-size:13px;cursor:pointer}
+.tab[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.list{display:flex;flex-direction:column;gap:10px}
+.job{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;align-items:start}
+.job.applied{border-color:var(--good)}
+.ring{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:17px;font-variant-numeric:tabular-nums;background:conic-gradient(var(--c) calc(var(--p)*1%),var(--surface-2) 0)}
+.ring i{width:40px;height:40px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-style:normal}
+.job h3{font-size:16px;font-weight:700}
+.job h3 a{color:var(--fg);text-decoration:none}
+.job h3 a:hover{color:var(--accent);text-decoration:underline}
+.meta{display:flex;flex-wrap:wrap;gap:4px 14px;color:var(--muted);font-size:13px;margin-top:2px}
+.meta .co{color:var(--fg);font-weight:600}
+.sal{font-family:var(--f-mono);font-size:12px;color:var(--fg)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.chip{font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--good-soft);color:var(--good)}
+.chip.gap{background:var(--warn-soft);color:var(--warn)}
+.chip.lvl{background:var(--accent-soft);color:var(--accent)}
+.acts{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:6px 10px;border-radius:7px;font:inherit;font-size:12.5px;cursor:pointer;text-align:center;text-decoration:none;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn[aria-pressed=true]{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.btn:focus-visible,.tab:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+aside{display:flex;flex-direction:column;gap:16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.panel h2{font-size:15px;margin-bottom:10px}
+.panel p.note{color:var(--muted);font-size:12.5px;margin:0 0 10px}
+.pipe{display:flex;flex-direction:column;gap:10px}
+.pipe div{display:flex;justify-content:space-between;gap:10px;align-items:baseline;border-bottom:1px dashed var(--line);padding-bottom:8px}
+.pipe div:last-child{border:0;padding:0}
+.pill{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.pill.g{background:var(--good-soft);color:var(--good)}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:grid;grid-template-columns:86px minmax(0,1fr) 30px;gap:8px;align-items:center;font-size:12.5px}
+.bar .t{height:8px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.bar .t b{display:block;height:100%;background:var(--c,var(--accent));border-radius:4px}
+.bar .n{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.skills{display:flex;flex-wrap:wrap;gap:5px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 14px;border-radius:9px;display:flex;gap:14px;align-items:center;font-size:13.5px;box-shadow:0 6px 24px rgba(0,0,0,.2);max-width:calc(100% - 32px);z-index:10}
+.toast button{background:none;border:0;color:inherit;font:inherit;font-weight:600;text-decoration:underline;cursor:pointer}
+.copybar{display:inline-flex;align-items:center;gap:8px;margin-top:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:5px 6px 5px 12px;max-width:100%}
+.copybar code{font-family:var(--f-mono);font-size:12.5px;user-select:all;overflow-wrap:anywhere}
+.cogroup{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.cohead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cohead h3{font-size:16px}
+.cocount{margin-left:auto;color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums}
+.corows{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column}
+.corows li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.corole{min-width:0;overflow-wrap:anywhere}
+.corole a{color:var(--fg)}
+.corole a:hover{color:var(--accent)}
+.cometa{color:var(--muted);font-size:12.5px;white-space:nowrap}
+@media (max-width:560px){.corows li{grid-template-columns:minmax(0,1fr) auto}.cometa{grid-column:1}}
+.addform{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.addform h3{font-size:15px}
+.addrow{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) auto;gap:8px}
+.addrow input{min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
+.addhint{margin:0;color:var(--muted);font-size:12.5px}
+@media (max-width:760px){.addrow{grid-template-columns:minmax(0,1fr)}}
+.appbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+.appbar #appCount{margin-right:auto;font-variant-numeric:tabular-nums}
+.empty{padding:30px;text-align:center;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--muted);margin-bottom:8px}
+.legend span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;background:var(--c)}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.job{grid-template-columns:52px minmax(0,1fr)}.acts{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}.wrap{padding-inline:16px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Nirav's Job Radar</h1>
+      <p>US data engineering and data platform roles pulled from company job boards and ranked against your Yahoo experience: GCP, BigQuery, Airflow, SQL, Python, data quality and pipeline migrations.</p>
+      <div class="copybar"><span style="color:var(--muted);font-size:12px">LinkedIn</span><code id="liUrl">https://linkedin.com/in/niravsshaha2</code><button type="button" class="btn primary" id="copyLi">Copy</button></div>
+    </div>
+    <div class="stamp">Snapshot Oct 8, 2026<br><span id="srcCount"></span></div>
+  </header>
+
+  <section class="stats" aria-label="Summary">
+    <div class="stat"><b id="sTotal">0</b><span>Matched roles</span></div>
+    <div class="stat"><b id="sStrong">0</b><span>Strong fit (85+)</span></div>
+    <div class="stat"><b id="sRemote">0</b><span>Remote in US</span></div>
+    <div class="stat"><b id="sMine">0</b><span>Saved or applied</span></div>
+  </section>
+
+  <div class="grid">
+    <main style="display:flex;flex-direction:column;gap:12px;min-width:0">
+      <div class="filters">
+        <input type="search" id="q" placeholder="Search title, company, skill…" aria-label="Search">
+        <select id="level" aria-label="Level">
+          <option value="">All levels</option><option>Mid</option><option>Senior</option><option>Staff+</option>
+        </select>
+        <select id="sort" aria-label="Sort">
+          <option value="score">Best fit</option><option value="posted">Newest</option><option value="company">Company A–Z</option>
+        </select>
+        <label class="chk"><input type="checkbox" id="remote"> Remote only</label>
+        <label class="chk"><input type="checkbox" id="bq"> Uses BigQuery/GCP</label>
+      </div>
+      <div class="tabs" role="group" aria-label="View">
+        <button class="tab" data-view="all" aria-pressed="true">All</button>
+        <button class="tab" data-view="saved" aria-pressed="false">Saved</button>
+        <button class="tab" data-view="applied" aria-pressed="false">Applied</button>
+        <button class="tab" data-view="hidden" aria-pressed="false">Hidden</button>
+      </div>
+      <div class="appbar" id="appBar" hidden>
+        <span id="appCount"></span>
+        <label for="appSort">Order by</label>
+        <select id="appSort">
+          <option value="recent">Most recently applied</option>
+          <option value="name">Company name A–Z</option>
+        </select>
+      </div>
+      <form class="addform" id="addForm" hidden>
+        <h3>Add a job you applied to elsewhere</h3>
+        <div class="addrow">
+          <input type="url" id="addUrl" placeholder="Paste the job link, e.g. https://careers.company.com/jobs/123" aria-label="Job link" required>
+          <input type="text" id="addCo" placeholder="Company (optional)" aria-label="Company">
+          <input type="text" id="addRole" placeholder="Role (optional)" aria-label="Role">
+          <button type="submit" class="btn primary">Add to Applied</button>
+        </div>
+        <p class="addhint" id="addHint">Company is filled in from the link when it can be read. You can edit it before adding.</p>
+      </form>
+      <div class="list" id="list"></div>
+    </main>
+
+    <aside>
+      <div class="panel">
+        <h2>My applications</h2>
+        <p class="note">From application confirmation emails in your personal Gmail since Oct 6, plus your Quantiphi screen. About 22 applications across 14 companies.</p>
+        <div class="pipe" id="pipe" style="max-height:420px;overflow:auto;padding-right:4px">
+          <span id="dashApplied" style="display:contents"></span>
+          <div><span><b>Quantiphi</b><br><span style="color:var(--muted);font-size:12.5px">Senior Data Engineer · Oct 8</span></span><span class="pill">Screening</span></div>
+          <div><span><b>Figma</b><br><span style="color:var(--muted);font-size:12.5px">Software Engineer, Data Infrastructure · Oct 8</span></span><span class="pill g">Applied</span></div>
+          <div><span><b>Figma</b><br><span style="color:var(--muted);font-size:12.5px">Data Scientist · Oct 8</span></span><span class="pill g">Applied</span></div>
+          <div><span><b>Figma</b><br><span style="color:var(--muted);font-size:12.5px">Data Scientist, Finance · Oct 8</span></span><span class="pill g">Applied</span></div>
+          <div><span><b>Gopuff</b><br><span style="color:var(--muted);font-size:12.5px">Analytics Engineer · Oct 8</span></span><span class="pill g">Applied</span></div>
+          <div><span><b>Celigo</b><br><span style="color:var(--muted);font-size:12.5px">Data Engineer · Oct 8</span></span><span class="pill g">Applied</span></div>
+          <div><span><b>Glean</b><br><span style="color:var(--muted);font-size:12.5px">Software Engineer (several roles) · Oct 8</span></span><span class="pill g">Applied</span></div>
+          <div><span><b>Atoms</b><br><span style="color:var(--muted);font-size:12.5px">Application in queue · Oct 8</span></span><span class="pill g">Applied</span></div>
+          <div><span><b>Strava</b><br><span style="color:var(--muted);font-size:12.5px">Senior Data Engineer · Oct 8</span></span><span class="pill g">Applied</span></div>
+          <div><span><b>DoorDash</b><br><span style="color:var(--muted);font-size:12.5px">Software Engineer, Data and AI Platform · Oct 8</span></span><span class="pill g">Applied</span></div>
+          <div><span><b>PlayStation Global</b><br><span style="color:var(--muted);font-size:12.5px">Software Engineer II, Java · Oct 8</span></span><span class="pill g">Applied</span></div>
+          <div><span><b>Charles Schwab</b><br><span style="color:var(--muted);font-size:12.5px">Data Engineer (2026-126919) · Oct 7</span></span><span class="pill g">Applied</span></div>
+          <div><span><b>Mastercard</b><br><span style="color:var(--muted);font-size:12.5px">Role not named in email · Oct 7</span></span><span class="pill g">Applied</span></div>
+          <div><span><b>Walmart</b><br><span style="color:var(--muted);font-size:12.5px">4 applications, roles not named in email · Oct 7</span></span><span class="pill g">Applied</span></div>
+          <div><span><b>IBM</b><br><span style="color:var(--muted);font-size:12.5px">Data Engineer, Data Platforms (Google) 1, 3, 4, 5 · Oct 7</span></span><span class="pill g">Applied</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>What these roles ask for</h2>
+        <p class="note">Share of matched roles that mention each skill. Gaps are the skills to pick up next.</p>
+        <div class="legend"><span style="--c:var(--good)">You have it</span><span style="--c:var(--warn)">Gap</span></div>
+        <div class="bars" id="bars"></div>
+      </div>
+      <div class="panel">
+        <h2>How fit is scored</h2>
+        <p class="note">Each posting's skills are weighted and compared with your experience. BigQuery, GCP and Airflow count most. Staff-level titles and 8+ year requirements lower the score. Salaries are the posted base ranges.</p>
+        <div class="skills" id="mySkills"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const JOBS = [{"company":"Discord","title":"Senior Data Engineer","loc":"San Francisco Bay Area","url":"https://job-boards.greenhouse.io/discord/jobs/8485884002","posted":"2026-10-08","score":99,"level":"Senior","years":4,"salary":"$220,500 \u2013 $245,000","remote":false,"match":["BigQuery","Airflow","SQL","Python","Data quality","ETL/ELT","Cost optimization","Data modeling","Analytics/BI","ML data"],"gaps":["dbt"],"isNew":false},{"company":"Nuro","title":"Software Engineer, Data Platform","loc":"Mountain View, California (HQ)","url":"https://nuro.ai/careersitem?gh_jid=7895644","posted":"2026-08-26","score":99,"level":"Mid","years":1,"salary":"","remote":false,"match":["BigQuery","GCP","Python","Data quality","ETL/ELT","Analytics/BI","ML data","Near real-time","GCS"],"gaps":[],"isNew":false},{"company":"Nuro","title":"Software Engineer, ML Data Infrastructure","loc":"Mountain View, California (HQ)","url":"https://nuro.ai/careersitem?gh_jid=7895818","posted":"2026-08-26","score":99,"level":"Mid","years":1,"salary":"","remote":false,"match":["BigQuery","GCP","Python","Data quality","ETL/ELT","Analytics/BI","ML data","Near real-time","GCS"],"gaps":[],"isNew":false},{"company":"PrizePicks","title":"Data Platform Engineer ","loc":"Remote","url":"http://prizepicks.com/position?gh_jid=7824471003","posted":"2026-09-18","score":99,"level":"Mid","years":3,"salary":"","remote":true,"match":["BigQuery","GCP","Airflow","Python","Data quality","ETL/ELT","Analytics/BI","ML data","Near real-time"],"gaps":["Spark","Kafka","Flink","AWS"],"isNew":false},{"company":"Ramp","title":"Software Engineer, Data Platform ","loc":"New York, NY (HQ)","url":"https://jobs.ashbyhq.com/ramp/bca0346c-b843-4795-96df-6091f51e421b","posted":"2026-03-11","score":99,"level":"Mid","years":null,"salary":"$168K \u2013 $324.5K \u2022 Offers Equity","remote":true,"match":["BigQuery","GCP","Airflow","SQL","Python","Cost optimization","Analytics/BI","ML data","Near real-time"],"gaps":["Snowflake","AWS","Terraform","Dagster"],"isNew":false},{"company":"Samsara","title":"Data Engineer","loc":"Remote - US","url":"https://www.samsara.com/company/careers/roles/8141959?gh_jid=8141959","posted":"2026-10-07","score":97,"level":"Mid","years":4,"salary":"$99,365 \u2013 $167,000","remote":true,"match":["GCP","Airflow","SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI","ML data"],"gaps":["Spark","Databricks","AWS","Dagster"],"isNew":false},{"company":"Discord","title":"Senior Data Engineer, Ads","loc":"Remote (U.S.)","url":"https://job-boards.greenhouse.io/discord/jobs/8299493002","posted":"2026-10-02","score":96,"level":"Senior","years":5,"salary":"$220,500 \u2013 $245,000","remote":true,"match":["BigQuery","SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI","ML data","Near real-time"],"gaps":["Spark","dbt","Kafka","Dagster"],"isNew":false},{"company":"Cloudflare","title":"Senior Data Engineer","loc":"In-Office","url":"https://boards.greenhouse.io/cloudflare/jobs/8055118?gh_jid=8055118","posted":"2026-10-02","score":96,"level":"Senior","years":5,"salary":"","remote":false,"match":["GCP","SQL","Python","Data quality","ETL/ELT","Cost optimization","Data modeling","Analytics/BI","ML data"],"gaps":["Scala/Java","Go"],"isNew":false},{"company":"Samsara","title":"Senior Data Engineer","loc":"Remote - US","url":"https://www.samsara.com/company/careers/roles/7964565?gh_jid=7964565","posted":"2026-09-25","score":94,"level":"Senior","years":5,"salary":"","remote":true,"match":["BigQuery","GCP","SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI","Near real-time"],"gaps":["Spark","dbt","Snowflake","Databricks","AWS"],"isNew":false},{"company":"Samsara","title":"Senior Data Engineer II","loc":"Remote - US","url":"https://www.samsara.com/company/careers/roles/8039914?gh_jid=8039914","posted":"2026-09-25","score":94,"level":"Senior","years":3,"salary":"$134,470 \u2013 $203,400","remote":true,"match":["BigQuery","GCP","SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI","Near real-time"],"gaps":["Spark","dbt","Snowflake","Databricks","AWS"],"isNew":false},{"company":"Anthropic","title":"Data Engineer","loc":"San Francisco, CA | New York City, NY | Seattle, WA","url":"https://job-boards.greenhouse.io/anthropic/jobs/4956672008","posted":"2026-08-21","score":94,"level":"Mid","years":5,"salary":"$320,000 \u2013 $405,000","remote":false,"match":["Airflow","SQL","Python","ETL/ELT","Migration","Data modeling","Analytics/BI"],"gaps":["dbt"],"isNew":false},{"company":"Anthropic","title":"Data Engineer, GTM","loc":"San Francisco, CA | New York City, NY","url":"https://job-boards.greenhouse.io/anthropic/jobs/5418610008","posted":"2026-09-08","score":94,"level":"Mid","years":5,"salary":"$320,000 \u2013 $405,000","remote":false,"match":["Airflow","SQL","Python","ETL/ELT","Migration","Data modeling","Analytics/BI"],"gaps":["dbt"],"isNew":false},{"company":"Faire","title":"Senior Finance Analytics Engineer","loc":"New York City, NY; San Francisco, CA","url":"https://boards.greenhouse.io/faire/jobs/8828560002?gh_jid=8828560002","posted":"2026-09-25","score":94,"level":"Senior","years":5,"salary":"$174,500 \u2013 $240,000","remote":false,"match":["BigQuery","Airflow","SQL","Python","Data quality","ETL/ELT","Migration","Data modeling","Analytics/BI","ML data"],"gaps":["dbt","Snowflake","AWS"],"isNew":false},{"company":"DoorDash","title":"Software Engineer II, Data Engineering","loc":"San Francisco, CA; Sunnyvale, CA","url":"https://job-boards.greenhouse.io/doordashusa/jobs/6458514","posted":"2026-10-06","score":93,"level":"Mid","years":3,"salary":"$130,600 \u2013 $192,000","remote":false,"match":["GCP","Airflow","SQL","Python","Dataproc/Hadoop","Data quality","ETL/ELT","Data modeling","Analytics/BI","ML data","Near real-time"],"gaps":["Spark","Snowflake","Kafka","Flink","AWS","Scala/Java"],"isNew":false},{"company":"Gemini","title":"Senior Data Engineer","loc":"New York, New York; Miami, Florida; Remote (USA)","url":"https://boards.greenhouse.io/embed/job_app?for=gemini&token=8076827&gh_jid=8076827","posted":"2026-10-02","score":93,"level":"Senior","years":5,"salary":"$126,000 \u2013 $180,000","remote":true,"match":["BigQuery","Airflow","SQL","Python","Data quality","ETL/ELT","Cost optimization","Data modeling","Analytics/BI","ML data","Near real-time"],"gaps":["Spark","Snowflake","Kafka","Databricks","Flink","AWS"],"isNew":false},{"company":"Robinhood","title":"Senior Software Engineer, Data Engineering","loc":"Menlo Park, CA","url":"https://boards.greenhouse.io/robinhood/jobs/4738660?t=gh_src=&gh_jid=4738660","posted":"2026-10-02","score":92,"level":"Senior","years":5,"salary":"$196,000 \u2013 $230,000","remote":false,"match":["Airflow","SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI","ML data"],"gaps":["Spark","Flink"],"isNew":false},{"company":"Harvey","title":"Senior Software Engineer, Data Platform","loc":"San Francisco","url":"https://jobs.ashbyhq.com/harvey/a725492f-3412-4699-a8cd-0d195bde3450","posted":"2026-08-25","score":92,"level":"Senior","years":5,"salary":"$193.4K \u2013 $290K \u2022 Offers Equity \u2022 Offers Bonus","remote":true,"match":["BigQuery","GCP","Airflow","SQL","Python","Data quality","ETL/ELT","Cost optimization","Data modeling","Analytics/BI","ML data","Near real-time"],"gaps":["Spark","dbt","Snowflake","Kafka","Databricks","Flink","AWS","Terraform","Dagster"],"isNew":false},{"company":"Harvey","title":"Senior Software Engineer, Data Platform","loc":"New York","url":"https://jobs.ashbyhq.com/harvey/79bef873-33b0-4b8b-b5f0-2256b2751907","posted":"2026-08-25","score":92,"level":"Senior","years":5,"salary":"$193.4K \u2013 $290K \u2022 Offers Equity \u2022 Offers Bonus","remote":true,"match":["BigQuery","GCP","Airflow","SQL","Python","Data quality","ETL/ELT","Cost optimization","Data modeling","Analytics/BI","ML data","Near real-time"],"gaps":["Spark","dbt","Snowflake","Kafka","Databricks","Flink","AWS","Terraform","Dagster"],"isNew":false},{"company":"Cloudflare","title":"Systems Engineer (Data Intelligence & Analytics Team)","loc":"In-Office","url":"https://boards.greenhouse.io/cloudflare/jobs/8022909?gh_jid=8022909","posted":"2026-10-05","score":91,"level":"Mid","years":null,"salary":"","remote":false,"match":["GCP","SQL","Python","Data quality","ETL/ELT","Cost optimization","Analytics/BI","ML data"],"gaps":["Scala/Java","Go"],"isNew":false},{"company":"Cloudflare","title":"Systems Engineer, Data Intelligence & Analytics Team","loc":"In-Office","url":"https://boards.greenhouse.io/cloudflare/jobs/8050813?gh_jid=8050813","posted":"2026-10-02","score":91,"level":"Mid","years":null,"salary":"","remote":false,"match":["GCP","SQL","Python","Data quality","ETL/ELT","Cost optimization","Analytics/BI","ML data"],"gaps":["Scala/Java","Go"],"isNew":false},{"company":"Chime","title":"Senior Software Engineer, Data Platform","loc":"San Francisco, CA, USA","url":"https://boards.greenhouse.io/chime/jobs/8840193002?gh_jid=8840193002","posted":"2026-10-02","score":91,"level":"Senior","years":5,"salary":"$187,000 \u2013 $259,000","remote":false,"match":["BigQuery","Airflow","Python","Data quality","ETL/ELT","Cost optimization","Data modeling","Analytics/BI","Near real-time"],"gaps":["dbt","Snowflake","Kafka","Flink","AWS","Scala/Java","Terraform","Dagster"],"isNew":false},{"company":"Block","title":"Senior Data Engineer, Product","loc":"Bay Area, CA, United States of America","url":"http://block.xyz/careers/jobs/5442647008?gh_jid=5442647008","posted":"2026-10-08","score":91,"level":"Senior","years":null,"salary":"$198,000 \u2013 $297,000","remote":false,"match":["Airflow","SQL","Python","Data quality","ETL/ELT","Cost optimization","Data modeling","Analytics/BI","ML data"],"gaps":["dbt","Snowflake","Databricks","Terraform"],"isNew":false},{"company":"Block","title":"Senior Data Engineer, Risk","loc":"Bay Area, CA, United States of America","url":"http://block.xyz/careers/jobs/5281312008?gh_jid=5281312008","posted":"2026-10-02","score":91,"level":"Senior","years":null,"salary":"$198,000 \u2013 $297,000","remote":false,"match":["Airflow","SQL","Python","Data quality","ETL/ELT","Cost optimization","Data modeling","Analytics/BI","ML data"],"gaps":["dbt","Snowflake","Databricks","Terraform"],"isNew":false},{"company":"Sigma Computing","title":"Data Engineer","loc":"New York City, NY","url":"https://job-boards.greenhouse.io/sigmacomputing/jobs/7809974003","posted":"2026-08-12","score":91,"level":"Mid","years":3,"salary":"$140k \u2013 $180k","remote":false,"match":["GCP","Airflow","SQL","Python","ETL/ELT","Data modeling","Analytics/BI"],"gaps":["Spark","dbt","Snowflake","Databricks","AWS","Dagster"],"isNew":false},{"company":"Sigma Computing","title":"Data Engineer","loc":"San Francisco, CA","url":"https://job-boards.greenhouse.io/sigmacomputing/jobs/7809973003","posted":"2026-08-12","score":91,"level":"Mid","years":3,"salary":"$140k \u2013 $180k","remote":false,"match":["GCP","Airflow","SQL","Python","ETL/ELT","Data modeling","Analytics/BI"],"gaps":["Spark","dbt","Snowflake","Databricks","AWS","Terraform","Dagster"],"isNew":false},{"company":"Figma","title":"Software Engineer - Data Infrastructure","loc":"San Francisco, CA ; New York, NY ; United States","url":"https://boards.greenhouse.io/figma/jobs/5551686004?gh_jid=5551686004","posted":"2026-08-11","score":90,"level":"Mid","years":5,"salary":"$153,000 \u2013 $376,000","remote":false,"match":["Airflow","SQL","Python","Data quality","ETL/ELT","Cost optimization","Analytics/BI","ML data","Near real-time"],"gaps":["Spark","dbt","Snowflake","Kafka","Flink","Go","Dagster"],"isNew":false},{"company":"Airbnb","title":"Senior Analytics Engineer, Airbnb.org","loc":"United States","url":"https://careers.airbnb.com/positions/8249633?gh_jid=8249633","posted":"2026-10-05","score":90,"level":"Senior","years":5,"salary":"$179,000 \u2013 $210,000","remote":false,"match":["Airflow","SQL","Python","Dataproc/Hadoop","Data quality","ETL/ELT","Data modeling","Analytics/BI"],"gaps":["Spark"],"isNew":false},{"company":"Coinbase","title":"Senior Analytics Engineer, GFCO Analytics","loc":"Remote - USA","url":"https://www.coinbase.com/careers/positions/8024880?gh_jid=8024880","posted":"2026-10-08","score":89,"level":"Senior","years":5,"salary":"$180,370 \u2013 $212,200","remote":true,"match":["Airflow","SQL","Python","Data quality","ETL/ELT","Cost optimization","Data modeling","Analytics/BI","ML data"],"gaps":["dbt","Snowflake"],"isNew":false},{"company":"Coinbase","title":"Senior Software Engineer - Data Platform ","loc":"Remote - USA","url":"https://www.coinbase.com/careers/positions/7812407?gh_jid=7812407","posted":"2026-09-24","score":89,"level":"Senior","years":5,"salary":"$186,065 \u2013 $218,900","remote":true,"match":["Airflow","SQL","Python","Data quality","ETL/ELT","Cost optimization","Analytics/BI","ML data","Near real-time"],"gaps":["Spark","Kafka","Scala/Java","Go"],"isNew":false},{"company":"Samsara","title":"Software Engineer - Data Platform","loc":"Remote - US","url":"https://www.samsara.com/company/careers/roles/7922530?gh_jid=7922530","posted":"2026-09-25","score":89,"level":"Mid","years":4,"salary":"$113,645 \u2013 $191,000","remote":true,"match":["Airflow","SQL","Python","Dataproc/Hadoop","Data quality","ETL/ELT","Analytics/BI","ML data","Near real-time"],"gaps":["Spark","Kafka","Databricks","AWS","Scala/Java","Go","Terraform","Dagster"],"isNew":false},{"company":"Faire","title":"Senior Analytics Engineer - Marketplace","loc":"San Francisco, CA","url":"https://boards.greenhouse.io/faire/jobs/8833031002?gh_jid=8833031002","posted":"2026-10-08","score":89,"level":"Senior","years":4,"salary":"$196,000 \u2013 $269,500","remote":false,"match":["Airflow","SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI","ML data"],"gaps":["dbt"],"isNew":false},{"company":"Faire","title":"Senior Product Analytics Engineer - Ads","loc":"San Francisco, CA","url":"https://boards.greenhouse.io/faire/jobs/8804205002?gh_jid=8804205002","posted":"2026-10-06","score":89,"level":"Senior","years":4,"salary":"$196,000 \u2013 $269,500","remote":false,"match":["Airflow","SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI","ML data"],"gaps":["dbt"],"isNew":false},{"company":"Waymo","title":"Senior Data Engineer","loc":"Mountain View, California, USA","url":"https://careers.withwaymo.com/jobs?gh_jid=7438328","posted":"2026-10-02","score":89,"level":"Senior","years":6,"salary":"$251,000 \u2013 $310,000","remote":false,"match":["BigQuery","SQL","Python","Dataproc/Hadoop","Data quality","ETL/ELT","Data modeling","Analytics/BI","Near real-time"],"gaps":["Spark","Snowflake","Kafka","Scala/Java"],"isNew":false},{"company":"Cohere","title":"Data Engineer, Data Foundations","loc":"New York","url":"https://jobs.ashbyhq.com/cohere/9baccd88-c051-474f-bfe8-6867fca54cee","posted":"2026-08-14","score":89,"level":"Mid","years":5,"salary":"$160K \u2013 $325K \u2022 Offers Equity \u2022 Multiple Ranges","remote":true,"match":["BigQuery","Airflow","SQL","Python","Analytics/BI"],"gaps":["Spark","dbt","Flink","Scala/Java","Go"],"isNew":false},{"company":"Pinterest","title":"Software Engineer II, Data Analytics & Engineering","loc":"San Francisco, CA, US; Remote, US","url":"https://www.pinterestcareers.com/jobs/?gh_jid=8213988","posted":"2026-10-02","score":88,"level":"Mid","years":null,"salary":"$123,696 \u2013 $254,667","remote":true,"match":["SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI","ML data"],"gaps":[],"isNew":false},{"company":"DoorDash","title":"Senior Software Engineer, Data Engineering","loc":"San Francisco, CA; Sunnyvale, CA, Seattle, WA","url":"https://job-boards.greenhouse.io/doordashusa/jobs/6108388","posted":"2026-10-06","score":88,"level":"Senior","years":3,"salary":"$130,600 \u2013 $192,000","remote":false,"match":["GCP","Airflow","SQL","Python","Dataproc/Hadoop","Data quality","ETL/ELT","Data modeling","Analytics/BI","ML data","Near real-time"],"gaps":["Spark","Snowflake","Kafka","Flink","AWS","Scala/Java"],"isNew":false},{"company":"Chime","title":"Senior Software Engineer, Data Engineering","loc":"San Francisco, CA, USA","url":"https://boards.greenhouse.io/chime/jobs/8505462002?gh_jid=8505462002","posted":"2026-10-01","score":88,"level":"Senior","years":3,"salary":"$164,000 \u2013 $227,000","remote":false,"match":["Airflow","SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI"],"gaps":["Spark","Snowflake","AWS"],"isNew":false},{"company":"Brex","title":"Data Engineer","loc":"San Francisco, California, United States","url":"https://www.brex.com/careers/8366850002?gh_jid=8366850002","posted":"2026-06-10","score":87,"level":"Mid","years":3,"salary":"$120,800 \u2013 $151,000","remote":false,"match":["Airflow","SQL","Python","ETL/ELT","Data modeling","Analytics/BI","Near real-time"],"gaps":["dbt","Snowflake"],"isNew":false},{"company":"Vanta","title":"Senior Analytics Engineer","loc":"Remote U.S.","url":"https://jobs.ashbyhq.com/vanta/795ab93b-57d9-4387-9cc1-ea7615721ec6","posted":"2026-10-01","score":86,"level":"Senior","years":null,"salary":"$190K \u2013 $224K \u2022 Offers Equity \u2022 This role is also eligible for medical benefits, 401(k) plan, and other company perk programs.","remote":true,"match":["BigQuery","Airflow","SQL","Data quality","Data modeling","Analytics/BI","Near real-time"],"gaps":["dbt","Snowflake","AWS","Dagster"],"isNew":false},{"company":"Anthropic","title":"Data Engineer, Safeguards","loc":"San Francisco, CA | New York City, NY","url":"https://job-boards.greenhouse.io/anthropic/jobs/5240422008","posted":"2026-08-21","score":85,"level":"Mid","years":8,"salary":"$320,000 \u2013 $405,000","remote":false,"match":["BigQuery","Airflow","SQL","Python","Data quality","ETL/ELT","Migration","Data modeling","Analytics/BI","ML data","Near real-time"],"gaps":["Spark","dbt","Snowflake","Kafka","AWS"],"isNew":false},{"company":"Nuro","title":"Senior/Staff Software Engineer, Data Platform","loc":"Mountain View, California (HQ)","url":"https://nuro.ai/careersitem?gh_jid=7895640","posted":"2026-08-26","score":85,"level":"Staff+","years":4,"salary":"","remote":false,"match":["BigQuery","GCP","Python","Data quality","ETL/ELT","Analytics/BI","ML data","Near real-time","GCS"],"gaps":[],"isNew":false},{"company":"Nuro","title":"Senior/Staff Software Engineer, ML Data Infrastructure","loc":"Mountain View, California (HQ)","url":"https://nuro.ai/careersitem?gh_jid=7895638","posted":"2026-08-26","score":85,"level":"Staff+","years":null,"salary":"","remote":false,"match":["BigQuery","GCP","Python","Data quality","ETL/ELT","Analytics/BI","ML data","Near real-time","GCS"],"gaps":[],"isNew":false},{"company":"Coinbase","title":"Senior Software Engineer, Data Engineering Platform","loc":"Remote - USA","url":"https://www.coinbase.com/careers/positions/8082199?gh_jid=8082199","posted":"2026-08-06","score":83,"level":"Senior","years":7,"salary":"$186,065 \u2013 $218,900","remote":true,"match":["Airflow","SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI","ML data"],"gaps":["Snowflake","Databricks","Scala/Java"],"isNew":false},{"company":"Scale AI","title":"Senior Data Engineer, Public Sector","loc":"Washington, DC","url":"https://job-boards.greenhouse.io/scaleai/jobs/4713597005","posted":"2026-10-06","score":83,"level":"Senior","years":5,"salary":"$180,000 \u2013 $225,000","remote":false,"match":["SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI"],"gaps":["dbt"],"isNew":false},{"company":"Mercury","title":"Senior Analytics Engineer","loc":"San Francisco, CA, New York, NY, Portland, OR, or Remote within Canada or United States","url":"https://job-boards.greenhouse.io/mercury/jobs/6217794004","posted":"2026-10-05","score":83,"level":"Senior","years":4,"salary":"$166,600 \u2013 $208,300","remote":true,"match":["Airflow","SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI"],"gaps":["dbt","Snowflake"],"isNew":false},{"company":"Figma","title":"Data Platform Engineer","loc":"San Francisco, CA ; New York, NY ; United States","url":"https://boards.greenhouse.io/figma/jobs/6201407004?gh_jid=6201407004","posted":"2026-09-21","score":82,"level":"Mid","years":5,"salary":"$153,000 \u2013 $376,000","remote":false,"match":["Python","Data quality","ETL/ELT","Analytics/BI","ML data","Near real-time"],"gaps":[],"isNew":false},{"company":"Roblox","title":"Senior Growth Data Engineer","loc":"San Mateo, CA, United States","url":"https://careers.roblox.com/jobs/8055450?gh_jid=8055450","posted":"2026-09-29","score":82,"level":"Senior","years":3,"salary":"$243,290 \u2013 $295,250","remote":false,"match":["GCP","Airflow","SQL","ETL/ELT","Analytics/BI","ML data","Near real-time"],"gaps":["Spark","AWS","Scala/Java","Dagster"],"isNew":false},{"company":"Plaid","title":"Senior Data Engineer","loc":"San Francisco HQ","url":"https://jobs.ashbyhq.com/plaid/eeb094c3-da73-411e-8dda-b3f4ee397f97","posted":"2026-09-03","score":82,"level":"Senior","years":4,"salary":"$190.8K \u2013 $238.8K \u2022 Offers Equity","remote":true,"match":["Airflow","SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI"],"gaps":["Spark","dbt","Snowflake","Kafka","Databricks","AWS","Go"],"isNew":false},{"company":"Anthropic","title":"Pre-training Data Infrastructure Engineer","loc":"San Francisco, CA","url":"https://job-boards.greenhouse.io/anthropic/jobs/4973067008","posted":"2026-09-17","score":81,"level":"Mid","years":null,"salary":"$500,000 \u2013 $850,000","remote":false,"match":["Python","Data quality","ETL/ELT","Migration","ML data"],"gaps":["Spark"],"isNew":false},{"company":"Oscar","title":"Analytics Engineer I","loc":"New York, New York, United States","url":"https://job-boards.greenhouse.io/oscar/jobs/7914958","posted":"2026-09-14","score":81,"level":"Mid","years":1,"salary":"$106,812 \u2013 $140,190","remote":false,"match":["GCP","SQL","Data quality","ETL/ELT","Data modeling","Analytics/BI"],"gaps":["dbt","AWS"],"isNew":false},{"company":"Oscar","title":"Senior Analytics Engineer","loc":"New York, New York, United States","url":"https://job-boards.greenhouse.io/oscar/jobs/7809846","posted":"2026-09-14","score":81,"level":"Senior","years":2,"salary":"$149,040 \u2013 $195,615","remote":false,"match":["GCP","SQL","Data quality","ETL/ELT","Cost optimization","Data modeling","Analytics/BI"],"gaps":["dbt","AWS"],"isNew":false},{"company":"Gusto","title":"Senior Data Engineer","loc":"Denver, CO - Hybrid; New York, NY - Hybrid; San Francisco, CA - Hybrid","url":"https://job-boards.greenhouse.io/gusto/jobs/8099751","posted":"2026-10-05","score":79,"level":"Senior","years":10,"salary":"$155,000 \u2013 $185,000","remote":false,"match":["BigQuery","SQL","Python","Data quality","ETL/ELT","Cost optimization","Data modeling","Analytics/BI"],"gaps":["dbt","Snowflake","Databricks","AWS","Scala/Java"],"isNew":false},{"company":"Waymo","title":"Senior Software Engineer, ML/Eval Data Platforms & Infrastructure","loc":"Mountain View, CA, USA; San Francisco, CA, USA","url":"https://careers.withwaymo.com/jobs?gh_jid=7991303","posted":"2026-10-02","score":79,"level":"Senior","years":3,"salary":"$213,000 \u2013 $263,000","remote":false,"match":["SQL","Python","ETL/ELT","Analytics/BI","ML data"],"gaps":[],"isNew":false},{"company":"Anthropic","title":"Staff+ Software Engineer, Data Infrastructure","loc":"Remote-Friendly (Travel-Required) | San Francisco, CA | Seattle, WA | New York City, NY","url":"https://job-boards.greenhouse.io/anthropic/jobs/5114768008","posted":"2026-08-21","score":77,"level":"Staff+","years":3,"salary":"$405,000 \u2013 $485,000","remote":true,"match":["BigQuery","GCP","Airflow","SQL","Python","ETL/ELT","Cost optimization","Migration","Analytics/BI","GCS"],"gaps":["Spark","dbt","AWS","Scala/Java","Go","Terraform"],"isNew":false},{"company":"Vercel","title":"Software Engineer, Financial Data Platform","loc":"Hybrid - San Francisco, New York City","url":"https://job-boards.greenhouse.io/vercel/jobs/5895013004","posted":"2026-09-24","score":77,"level":"Mid","years":4,"salary":"$190,000 \u2013 $258,000","remote":false,"match":["GCP","Data quality","ETL/ELT","Data modeling","Analytics/BI","Near real-time"],"gaps":["Snowflake","Kafka","AWS"],"isNew":false},{"company":"Anyscale","title":"Software Engineer (Ray Data)","loc":"San Francisco","url":"https://jobs.ashbyhq.com/anyscale/01aef589-e268-4b22-b513-d1f9f076210f","posted":"2026-08-28","score":77,"level":"Mid","years":null,"salary":"$215K \u2013 $230K \u2022 Offers Equity","remote":false,"match":["GCP","Python","ETL/ELT","ML data"],"gaps":[],"isNew":false},{"company":"Samsara","title":"Senior AI Data & Analytics Engineer II","loc":"Remote - NYC","url":"https://www.samsara.com/company/careers/roles/8262123?gh_jid=8262123","posted":"2026-10-07","score":76,"level":"Senior","years":8,"salary":"$137,445 \u2013 $231,000","remote":true,"match":["BigQuery","SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI","ML data"],"gaps":["dbt","Snowflake","Databricks"],"isNew":false},{"company":"Samsara","title":"Senior AI Data & Analytics Engineer II","loc":"Remote - SF Bay Area","url":"https://www.samsara.com/company/careers/roles/7917475?gh_jid=7917475","posted":"2026-10-07","score":76,"level":"Senior","years":8,"salary":"$137,445 \u2013 $231,000","remote":true,"match":["BigQuery","SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI","ML data"],"gaps":["dbt","Snowflake","Databricks"],"isNew":false},{"company":"OpenAI","title":"Software Engineer, Habitat (Online Data)","loc":"Seattle","url":"https://jobs.ashbyhq.com/openai/460b4295-3803-4dda-983d-3b0fea0b0fc4","posted":"2025-04-14","score":76,"level":"Mid","years":3,"salary":"$266K \u2013 $445K \u2022 Offers Equity","remote":false,"match":["Python","Data quality","ETL/ELT","Cost optimization"],"gaps":[],"isNew":false},{"company":"Cloudflare","title":"Senior Systems Engineer - Go-To-Market Data Team","loc":"Hybrid","url":"https://boards.greenhouse.io/cloudflare/jobs/8082544?gh_jid=8082544","posted":"2026-10-02","score":75,"level":"Senior","years":10,"salary":"","remote":false,"match":["BigQuery","SQL","Data quality","ETL/ELT","Cost optimization","Data modeling","Analytics/BI","ML data"],"gaps":["dbt","Snowflake","Go"],"isNew":false},{"company":"OpenAI","title":"Data Engineer","loc":"San Francisco","url":"https://jobs.ashbyhq.com/openai/fc5bbc77-a30c-4e7a-9acc-8a2e748545b4","posted":"2023-09-26","score":75,"level":"Mid","years":3,"salary":"$235K \u2013 $385K \u2022 Offers Equity","remote":true,"match":["Airflow","Python","Dataproc/Hadoop","ETL/ELT","Analytics/BI"],"gaps":["Spark","Flink","AWS","Scala/Java","Dagster"],"isNew":false},{"company":"OpenAI","title":"Data Engineer, Core Experimentation","loc":"Seattle","url":"https://jobs.ashbyhq.com/openai/2796d32a-9f7c-4008-a2c5-50dd53b0f2fe","posted":"2026-10-06","score":75,"level":"Mid","years":3,"salary":"$347K \u2013 $385K \u2022 Offers Equity","remote":true,"match":["Airflow","Python","Dataproc/Hadoop","ETL/ELT","Analytics/BI"],"gaps":["Spark","Flink","AWS","Scala/Java","Dagster"],"isNew":false},{"company":"DoorDash","title":"Software Engineer, Data Platform (All Teams)","loc":"San Francisco, CA; Seattle, WA; Sunnyvale, CA; New York, NY","url":"https://job-boards.greenhouse.io/doordashusa/jobs/7577073","posted":"2026-10-06","score":74,"level":"Mid","years":2,"salary":"$130,600 \u2013 $192,000","remote":false,"match":["Airflow","Data quality","Cost optimization","Analytics/BI","ML data","Near real-time"],"gaps":["Spark","Kafka","Flink"],"isNew":false},{"company":"Fivetran","title":"Senior Software Engineer - Metadata","loc":"Oakland, California, United States","url":"https://www.fivetran.com/careers/job?gh_jid=7865591003","posted":"2026-10-02","score":74,"level":"Senior","years":5,"salary":"$174,915 \u2013 $209,906","remote":false,"match":["GCP","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI","ML data"],"gaps":["dbt","Snowflake","Kafka","AWS","Scala/Java"],"isNew":false},{"company":"Fivetran","title":"Senior Software Engineer - Metadata","loc":"Denver, Colorado, United States, AMER","url":"https://www.fivetran.com/careers/job?gh_jid=7865559003","posted":"2026-10-02","score":74,"level":"Senior","years":5,"salary":"$163,920 \u2013 $196,712","remote":false,"match":["GCP","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI","ML data"],"gaps":["dbt","Snowflake","Kafka","AWS","Scala/Java"],"isNew":false},{"company":"Block","title":"Software Engineer, Data Platform","loc":"Bay Area, CA, United States of America","url":"http://block.xyz/careers/jobs/5381381008?gh_jid=5381381008","posted":"2026-10-08","score":74,"level":"Mid","years":null,"salary":"$180,000 \u2013 $270,000","remote":false,"match":["Airflow","Python","Data quality","Cost optimization","Analytics/BI"],"gaps":["dbt","Snowflake","Databricks","AWS","Terraform"],"isNew":false},{"company":"Harvey","title":"Senior Analytics Engineer, Finance","loc":"New York","url":"https://jobs.ashbyhq.com/harvey/cf7b6b62-44c6-40ae-ac94-7f903370dcd5","posted":"2026-05-25","score":74,"level":"Senior","years":5,"salary":"$155K \u2013 $235K \u2022 Offers Equity \u2022 Offers Bonus","remote":true,"match":["SQL","Python","Data quality","ETL/ELT","Data modeling","Analytics/BI","Near real-time"],"gaps":["dbt","Snowflake"],"isNew":false},{"company":"Harvey","title":"Software Engineer, Database Infra","loc":"San Francisco","url":"https://jobs.ashbyhq.com/harvey/313d5aa8-bfc9-4057-b9a3-b73b4894f6a7","posted":"2026-03-20","score":73,"level":"Mid","years":10,"salary":"$190,720 \u2013 $325,000 \u2022 Offers Equity \u2022 Offers Bonus","remote":true,"match":["GCP","SQL","Python","Data quality","Migration","Data modeling","Analytics/BI","ML data","Near real-time"],"gaps":["Kafka","AWS","Go","Terraform"],"isNew":false},{"company":"Cloudflare","title":"Systems Engineer - Database Platform","loc":"Hybrid","url":"https://boards.greenhouse.io/cloudflare/jobs/8158016?gh_jid=8158016","posted":"2026-10-02","score":72,"level":"Mid","years":null,"salary":"$157,000 \u2013 $196,000","remote":false,"match":["Python","Data quality","Cost optimization","Migration","Data modeling"],"gaps":["Go","Terraform"],"isNew":false},{"company":"Modal","title":"Analytics Engineer","loc":"New York","url":"https://jobs.ashbyhq.com/modal/a518f2cd-e0c7-4105-9004-d7971f7b1daf","posted":"2026-09-23","score":71,"level":"Mid","years":null,"salary":"$150K \u2013 $250K","remote":false,"match":["SQL","Python","ETL/ELT","Cost optimization","Analytics/BI"],"gaps":["dbt","Snowflake"],"isNew":false},{"company":"Cloudflare","title":"Senior Software Engineer, Distributed Databases","loc":"In-Office","url":"https://boards.greenhouse.io/cloudflare/jobs/7896462?gh_jid=7896462","posted":"2026-10-02","score":70,"level":"Senior","years":null,"salary":"$185,000 \u2013 $254,000","remote":false,"match":["SQL","Data quality","Cost optimization","Data modeling","Analytics/BI","ML data"],"gaps":["Go","Terraform"],"isNew":false},{"company":"Asana","title":"Software Engineer, Data Loading Infrastructure ","loc":"San Francisco","url":"https://www.asana.com/jobs/apply/7962412?gh_jid=7962412","posted":"2026-09-30","score":70,"level":"Mid","years":2,"salary":"$171,000 \u2013 $190,000","remote":false,"match":["Data quality","ETL/ELT","Migration","ML data","Near real-time"],"gaps":[],"isNew":false},{"company":"OpenAI","title":"Software Engineer, Database Systems","loc":"San Francisco","url":"https://jobs.ashbyhq.com/openai/2b5e8e15-7952-4170-a927-2ad68e318ed6","posted":"2025-07-29","score":69,"level":"Mid","years":2,"salary":"$266K \u2013 $445K \u2022 Offers Equity","remote":false,"match":["GCP","Data quality","ETL/ELT","Analytics/BI","Near real-time"],"gaps":["AWS","Terraform"],"isNew":false},{"company":"Discord","title":"Staff Data Engineer - Data Infrastructure","loc":"San Francisco Bay Area","url":"https://job-boards.greenhouse.io/discord/jobs/8691572002","posted":"2026-09-11","score":68,"level":"Staff+","years":7,"salary":"$245,000 \u2013 $279,000","remote":false,"match":["BigQuery","SQL","Python","Data quality","Data modeling","Analytics/BI"],"gaps":["dbt"],"isNew":false},{"company":"Mixpanel","title":"Senior Software Engineer, Data Foundation","loc":"San Francisco, US (Hybrid)","url":"https://job-boards.greenhouse.io/mixpanel/jobs/7943560","posted":"2026-10-08","score":68,"level":"Senior","years":null,"salary":"","remote":false,"match":["Python","Data quality","Analytics/BI","ML data"],"gaps":[],"isNew":false},{"company":"Databricks","title":"Senior Software Engineer - Distributed Data Systems","loc":"Bellevue, Washington","url":"https://databricks.com/company/careers/open-positions/job?gh_jid=6936994002","posted":"2026-09-21","score":67,"level":"Senior","years":5,"salary":"$157,700 \u2013 $213,800","remote":false,"match":["SQL","Dataproc/Hadoop","ETL/ELT","Cost optimization","Analytics/BI","ML data","Near real-time","GCS"],"gaps":["Spark","Databricks","AWS","Scala/Java"],"isNew":false},{"company":"Databricks","title":"Senior Software Engineer - Distributed Data Systems","loc":"San Francisco, California","url":"https://databricks.com/company/careers/open-positions/job?gh_jid=4513122002","posted":"2026-09-21","score":67,"level":"Senior","years":5,"salary":"$166,000 \u2013 $225,000","remote":false,"match":["SQL","Dataproc/Hadoop","ETL/ELT","Cost optimization","Analytics/BI","ML data","Near real-time","GCS"],"gaps":["Spark","Databricks","AWS","Scala/Java"],"isNew":false},{"company":"Databricks","title":"Senior Software Engineer - Distributed Data Systems","loc":"Mountain View, California","url":"https://databricks.com/company/careers/open-positions/job?gh_jid=6544325002","posted":"2026-09-21","score":67,"level":"Senior","years":5,"salary":"$166,000 \u2013 $225,000","remote":false,"match":["SQL","Dataproc/Hadoop","ETL/ELT","Cost optimization","Analytics/BI","ML data","Near real-time","GCS"],"gaps":["Spark","Databricks","AWS","Scala/Java"],"isNew":false},{"company":"Coinbase","title":"Senior Market Data Engineer","loc":"Remote - USA","url":"https://www.coinbase.com/careers/positions/8180833?gh_jid=8180833","posted":"2026-09-04","score":67,"level":"Senior","years":3,"salary":"$191,250 \u2013 $225,000","remote":true,"match":["Data quality","ETL/ELT","Cost optimization","ML data","Near real-time"],"gaps":["Scala/Java"],"isNew":false},{"company":"Roblox","title":"Senior Software Engineer - Data Infrastructure, Safety","loc":"San Mateo, CA, United States","url":"https://careers.roblox.com/jobs/7852258?gh_jid=7852258","posted":"2026-10-08","score":67,"level":"Senior","years":4,"salary":"$196,750 \u2013 $243,290","remote":false,"match":["Python","Data quality","Analytics/BI","ML data","Near real-time"],"gaps":["Go"],"isNew":false},{"company":"Vercel","title":"Software Engineer - Data Platform","loc":"Remote - United States","url":"https://job-boards.greenhouse.io/vercel/jobs/6188400004","posted":"2026-09-25","score":66,"level":"Mid","years":8,"salary":"$232,000 \u2013 $348,000","remote":true,"match":["GCP","Data quality","ETL/ELT","Data modeling","Analytics/BI","ML data","Near real-time"],"gaps":["Snowflake","Kafka","AWS"],"isNew":false},{"company":"Nuro","title":"Senior Software Engineer, Perception Data Infrastructure","loc":"Mountain View, California (HQ)","url":"https://nuro.ai/careersitem?gh_jid=7736012","posted":"2026-08-26","score":66,"level":"Senior","years":4,"salary":"","remote":false,"match":["Python","ETL/ELT","ML data","Near real-time"],"gaps":[],"isNew":false},{"company":"Harvey","title":"Senior Analytics Engineer, Product","loc":"San Francisco","url":"https://jobs.ashbyhq.com/harvey/754bb046-a622-40dd-8416-0af87f1f0301","posted":"2026-08-04","score":66,"level":"Senior","years":5,"salary":"$155.8K \u2013 $233.6K \u2022 Offers Equity \u2022 Offers Bonus","remote":true,"match":["SQL","Python","ETL/ELT","Data modeling","Analytics/BI","Near real-time"],"gaps":["dbt","Snowflake"],"isNew":false},{"company":"Cloudflare","title":"Senior Software Engineer, R2 Metadata","loc":"Hybrid","url":"https://boards.greenhouse.io/cloudflare/jobs/7276690?gh_jid=7276690","posted":"2026-10-02","score":65,"level":"Senior","years":null,"salary":"","remote":false,"match":["SQL","Data quality","Cost optimization","Data modeling","ML data"],"gaps":["AWS","Go"],"isNew":false},{"company":"Faire","title":"Staff Data Infrastructure Engineer","loc":"New York City, NY; San Francisco, CA","url":"https://boards.greenhouse.io/faire/jobs/8806617002?gh_jid=8806617002","posted":"2026-10-01","score":65,"level":"Staff+","years":null,"salary":"$246,500 \u2013 $339,000","remote":false,"match":["Airflow","SQL","Python","Data quality","ETL/ELT","Migration","Data modeling","Analytics/BI","ML data","Near real-time"],"gaps":["Spark","Snowflake","Kafka","Databricks","AWS","Scala/Java","Terraform"],"isNew":false}];
+const GMAIL_APPS = [{"company": "Quantiphi", "title": "Senior Data Engineer", "at": "2026-10-08T15:22:00-05:00", "status": "Screening"}, {"company": "Figma", "title": "Data Scientist", "at": "2026-10-08T17:10:00-05:00", "status": "Applied"}, {"company": "Figma", "title": "Data Scientist, Finance", "at": "2026-10-08T17:11:00-05:00", "status": "Applied"}, {"company": "Gopuff", "title": "Analytics Engineer", "at": "2026-10-08T16:48:00-05:00", "status": "Applied"}, {"company": "Celigo", "title": "Data Engineer", "at": "2026-10-08T16:16:00-05:00", "status": "Applied"}, {"company": "Glean", "title": "Software Engineer (several roles)", "at": "2026-10-08T14:10:00-05:00", "status": "Applied"}, {"company": "Atoms", "title": "Role not named in email", "at": "2026-10-08T13:35:00-05:00", "status": "Applied"}, {"company": "Strava", "title": "Senior Data Engineer", "at": "2026-10-08T13:25:00-05:00", "status": "Applied"}, {"company": "DoorDash", "title": "Software Engineer, Data and AI Platform", "at": "2026-10-08T12:21:00-05:00", "status": "Applied"}, {"company": "PlayStation Global", "title": "Software Engineer II, Java", "at": "2026-10-08T12:12:00-05:00", "status": "Applied"}, {"company": "Charles Schwab", "title": "Data Engineer (2026-126919)", "at": "2026-10-07T17:33:00-05:00", "status": "Applied"}, {"company": "Mastercard", "title": "Role not named in email", "at": "2026-10-07T16:49:00-05:00", "status": "Applied"}, {"company": "Walmart", "title": "4 applications, roles not named in email", "at": "2026-10-07T16:35:00-05:00", "status": "Applied"}, {"company": "IBM", "title": "Data Engineer, Data Platforms (Google) 5", "at": "2026-10-07T16:30:00-05:00", "status": "Applied"}, {"company": "IBM", "title": "Data Engineer, Data Platforms (Google) 3", "at": "2026-10-07T16:30:00-05:00", "status": "Applied"}, {"company": "IBM", "title": "Data Engineer, Data Platforms (Google) 1", "at": "2026-10-07T16:25:00-05:00", "status": "Applied"}, {"company": "IBM", "title": "Data Engineer, Data Platforms (Google) 4", "at": "2026-10-07T16:20:00-05:00", "status": "Applied"}];
+const APPLIED_COS = ["Figma","DoorDash","Quantiphi","Gopuff","Celigo","Glean","Atoms","Strava","PlayStation","Schwab","Mastercard","Walmart","IBM"];
+const HAVE = ["BigQuery","GCP","Airflow","SQL","Python","Dataproc/Hadoop","Data quality","ETL/ELT","Cost optimization","Migration","Data modeling","Analytics/BI","ML data","Near real-time","GCS"];
+const $ = s => document.querySelector(s);
+let state = {saved:{},applied:{},hidden:{},manual:[]};
+try { const s = JSON.parse(localStorage.getItem("radar") || "null"); if (s) state = Object.assign(state, s); } catch(e){}
+const persist = () => { try { localStorage.setItem("radar", JSON.stringify(state)); } catch(e){} };
+let view = "all";
+if (!state.seeded){ JOBS.forEach(j=>{ if (/5551686004/.test(j.url)) state.applied[j.url]=true; }); state.seeded=true; persist(); }
+
+JOBS.forEach((j,i)=> j.id = j.url || String(i));
+
+function color(s){ return s>=85 ? "var(--good)" : s>=75 ? "var(--accent)" : "var(--warn)"; }
+function esc(s){ return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function filtered(){
+  const q = $("#q").value.trim().toLowerCase(), lvl = $("#level").value, rem = $("#remote").checked, bq = $("#bq").checked;
+  let r = JOBS.filter(j=>{
+    if (view==="hidden") { if (!state.hidden[j.id]) return false; }
+    else if (view==="all" && state.applied[j.id]) return false;
+    else if (state.hidden[j.id]) return false;
+    if (view==="saved" && !state.saved[j.id]) return false;
+    if (view==="applied" && !state.applied[j.id]) return false;
+    if (lvl && j.level!==lvl) return false;
+    if (rem && !j.remote) return false;
+    if (bq && !j.match.some(m=>m==="BigQuery"||m==="GCP")) return false;
+    if (q && !(j.title+" "+j.company+" "+j.loc+" "+j.match.join(" ")+" "+j.gaps.join(" ")).toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const s = $("#sort").value;
+  r.sort((a,b)=> s==="posted" ? (b.posted||"").localeCompare(a.posted||"") : s==="company" ? a.company.localeCompare(b.company) || b.score-a.score : b.score-a.score);
+  return r;
+}
+
+function render(){
+  const r = filtered();
+  $("#list").innerHTML = r.length ? r.map(j=>`
+    <article class="job ${state.applied[j.id]?"applied":""}">
+      <div class="ring" style="--p:${j.score};--c:${color(j.score)}" title="Fit score"><i>${j.score}</i></div>
+      <div style="min-width:0">
+        <h3><a href="${esc(j.url)}" target="_blank" rel="noopener">${esc(j.title)}</a></h3>
+        <div class="meta"><span class="co">${esc(j.company)}</span><span>${esc(j.loc)}</span>${j.salary?`<span class="sal">${esc(j.salary)}</span>`:""}${j.posted?`<span>Updated ${esc(j.posted)}</span>`:""}</div>
+        <div class="chips">
+          ${APPLIED_COS.includes(j.company)&&!state.applied[j.id]?`<span class="chip lvl">You applied to another role here</span>`:""}${j.isNew?`<span class="chip lvl" style="background:var(--accent);color:var(--surface)">New</span>`:""}<span class="chip lvl">${esc(j.level)}${j.years?` · ${j.years}+ yrs`:""}${j.remote?" · Remote":""}</span>
+          ${j.match.slice(0,7).map(m=>`<span class="chip">${esc(m)}</span>`).join("")}
+          ${j.gaps.map(g=>`<span class="chip gap">${esc(g)}</span>`).join("")}
+        </div>
+      </div>
+      <div class="acts">
+        ${state.applied[j.id]?`<span class="btn" aria-pressed="true">Applied${stamp(state.applied[j.id],j)?" "+esc(fmt(stamp(state.applied[j.id],j))):""}</span>`:`<a class="btn primary" data-apply="${esc(j.id)}" href="${esc(j.url)}" target="_blank" rel="noopener">Apply</a>`}
+        <button class="btn" data-act="saved" data-id="${esc(j.id)}" aria-pressed="${!!state.saved[j.id]}">${state.saved[j.id]?"Saved":"Save"}</button>
+        ${state.applied[j.id]?`<button class="btn" data-act="applied" data-id="${esc(j.id)}">Undo applied</button>`:""}
+        <button class="btn" data-act="hidden" data-id="${esc(j.id)}">${state.hidden[j.id]?"Unhide":"Hide"}</button>
+      </div>
+    </article>`).join("") : "";
+  let extra = "";
+  if (view==="applied"){
+    const q = $("#q").value.trim().toLowerCase();
+    const items = [
+      ...r.map(j=>({company:j.company,title:j.title,url:j.url,id:j.id,ms:stamp(state.applied[j.id],j),status:"Applied",src:/5551686004/.test(j.url)&&state.applied[j.id]===true?"Gmail":"Dashboard"})),
+      ...(state.manual||[]).filter(a=>!q || (a.company+" "+a.title).toLowerCase().includes(q)).map(a=>({...a,src:"Added by link",mi:a.mid,ms:a.at?Date.parse(a.at):(a.date?stamp(a.date):Number(a.mid))})),
+      ...GMAIL_APPS.filter(a=>!q || (a.company+" "+a.title).toLowerCase().includes(q)).map(a=>({...a,src:"Gmail",ms:Date.parse(a.at)}))
+    ];
+    const groups = {};
+    items.forEach(it=>{ (groups[it.company] = groups[it.company] || []).push(it); });
+    const ts = i=> i.ms || 0;
+    Object.values(groups).forEach(g=>g.sort((a,b)=>ts(b)-ts(a)));
+    const latest = c=> Math.max(...groups[c].map(ts));
+    const bySort = $("#appSort").value;
+    const order = Object.keys(groups).sort((a,b)=> bySort==="name" ? a.localeCompare(b,undefined,{sensitivity:"base"}) : latest(b)-latest(a) || a.localeCompare(b));
+    $("#appCount").textContent = `${items.length} applications · ${order.length} companies`;
+    $("#list").innerHTML = order.length ? order.map(c=>{
+      const g = groups[c], screening = g.some(i=>i.status==="Screening");
+      return `<section class="cogroup">
+        <div class="cohead"><h3>${esc(c)}</h3><span class="pill${screening?"":" g"}">${screening?"Screening":"Applied"}</span><span class="cocount">${g.length} ${g.length===1?"role":"roles"}</span></div>
+        <ul class="corows">${g.map(i=>`<li>
+          <span class="corole">${i.url?`<a href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.title)}</a>`:esc(i.title)}</span>
+          <span class="cometa">${esc(fmt(i.ms))} · ${esc(i.src)}</span>
+          ${i.id?`<button class="btn" data-act="applied" data-id="${esc(i.id)}">Undo</button>`:i.mi?`<button class="btn" data-rm="${esc(i.mi)}">Remove</button>`:""}
+        </li>`).join("")}</ul>
+      </section>`; }).join("") : `<div class="empty">No applications match this search.</div>`;
+    extra = "grouped";
+  }
+  if (view!=="applied" && !r.length) $("#list").innerHTML = `<div class="empty">No roles match these filters. Clear the search or switch to All.</div>`;
+
+  const visible = JOBS.filter(j=>!state.hidden[j.id]);
+  $("#sTotal").textContent = visible.length;
+  $("#sStrong").textContent = visible.filter(j=>j.score>=85).length;
+  $("#sRemote").textContent = visible.filter(j=>j.remote).length;
+  $("#sMine").textContent = new Set([...Object.keys(state.saved).filter(k=>state.saved[k]),...Object.keys(state.applied).filter(k=>state.applied[k])]).size + GMAIL_APPS.length + (state.manual||[]).length;
+}
+
+function bars(){
+  const cnt = {};
+  JOBS.forEach(j=>[...j.match,...j.gaps].forEach(s=>cnt[s]=(cnt[s]||0)+1));
+  const rows = Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,14);
+  $("#bars").innerHTML = rows.map(([k,v])=>{
+    const p = Math.round(v/JOBS.length*100), have = HAVE.includes(k);
+    return `<div class="bar" style="--c:${have?"var(--good)":"var(--warn)"}"><span>${esc(k)}</span><div class="t"><b style="width:${p}%"></b></div><span class="n">${p}%</span></div>`;
+  }).join("");
+  $("#mySkills").innerHTML = HAVE.map(h=>`<span class="chip">${esc(h)}</span>`).join("");
+  $("#srcCount").textContent = `${new Set(JOBS.map(j=>j.company)).size} companies · ${JOBS.length} roles`;
+}
+
+let toastTimer;
+function toast(msg, undo){
+  let el = document.getElementById("toast");
+  if (!el){ el = document.createElement("div"); el.id="toast"; el.className="toast"; el.setAttribute("role","status"); document.body.appendChild(el); }
+  el.innerHTML = `<span>${esc(msg)}</span>${undo?'<button type="button" id="undoBtn">Undo</button>':""}`;
+  el.hidden = false;
+  if (undo) el.querySelector("#undoBtn").onclick = ()=>{ undo(); el.hidden = true; };
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>{ el.hidden = true; }, 6000);
+}
+const FIGMA_DI_AT = "2026-10-08T17:07:00-05:00";
+function stamp(v, j){ if (typeof v==="string"){ const x = Date.parse(v); if (!isNaN(x)) return x; const y = Date.parse(v+" 2026"); return isNaN(y)?0:y; } if (v===true && j && /5551686004/.test(j.url)) return Date.parse(FIGMA_DI_AT); return 0; }
+function fmt(ms){ if (!ms) return "Date unknown"; const d = new Date(ms); return d.toLocaleDateString("en-US",{month:"short",day:"numeric"})+", "+d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}); }
+function today(){ return new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"}); }
+function dashPanel(){
+  const mine = JOBS.filter(j=>typeof state.applied[j.id]==="string");
+  document.getElementById("dashApplied").innerHTML = mine.map(j=>`<div><span><b>${esc(j.company)}</b><br><span style="color:var(--muted);font-size:12.5px">${esc(j.title)} · ${esc(fmt(stamp(state.applied[j.id],j)))} · from dashboard</span></span><span class="pill g">Applied</span></div>`).join("");
+}
+document.addEventListener("click", e=>{
+  const a = e.target.closest("[data-apply]");
+  if (a){ const id = a.dataset.apply, j = JOBS.find(x=>x.id===id);
+    state.applied[id] = new Date().toISOString(); delete state.saved[id]; persist();
+    setTimeout(()=>{ render(); dashPanel(); }, 0);
+    toast(`Moved ${j?j.company:"role"} to Applied`, ()=>{ delete state.applied[id]; persist(); render(); dashPanel(); });
+    return; }
+  const b = e.target.closest("[data-act]");
+  if (b){ const {act,id} = b.dataset; if (state[act][id]) delete state[act][id]; else state[act][id] = true; persist(); render(); dashPanel(); return; }
+  const t = e.target.closest(".tab");
+  if (t){ view = t.dataset.view; document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-pressed", x===t)); $("#addForm").hidden = view!=="applied"; $("#appBar").hidden = view!=="applied"; render(); return; }
+  const rm = e.target.closest("[data-rm]");
+  if (rm){ const id = rm.dataset.rm, gone = state.manual.find(m=>m.mid===id); state.manual = state.manual.filter(m=>m.mid!==id); persist(); render();
+    toast(`Removed ${gone?gone.company:"job"}`, ()=>{ if (gone){ state.manual.push(gone); persist(); render(); } }); }
+});
+["q","level","sort","remote","bq","appSort"].forEach(id=>$("#"+id).addEventListener("input",render));
+bars(); render(); dashPanel();
+function guessCompany(u){
+  try {
+    const url = new URL(u), h = url.hostname.replace(/^www\./,""), parts = url.pathname.split("/").filter(Boolean);
+    const cap = s=>s ? s.replace(/[-_]+/g," ").replace(/\b\w/g,c=>c.toUpperCase()) : "";
+    if (/greenhouse\.io$/.test(h) || /lever\.co$/.test(h) || /ashbyhq\.com$/.test(h) || /workable\.com$/.test(h) || /smartrecruiters\.com$/.test(h)) return cap(parts[0]==="embed"?url.searchParams.get("for"):parts[0]);
+    if (/myworkdayjobs\.com$/.test(h) || /icims\.com$/.test(h) || /taleo\.net$/.test(h)) return cap(h.split(".")[0].replace(/^careers-?/,""));
+    if (/linkedin\.com$/.test(h)) { const m = url.pathname.match(/\/jobs\/view\/[^/]*?-at-([a-z0-9-]+?)-\d+/i); return m ? cap(m[1]) : ""; }
+    const segs = h.split("."); const base = segs.length>2 && /^(careers|jobs|apply|boards|job-boards|work|join)$/.test(segs[0]) ? segs[1] : segs[segs.length-2];
+    return cap(base);
+  } catch(e){ return ""; }
+}
+$("#addUrl").addEventListener("input", ()=>{
+  const g = guessCompany($("#addUrl").value.trim());
+  if (g && !$("#addCo").dataset.touched) $("#addCo").value = g;
+});
+$("#addCo").addEventListener("input", ()=>{ $("#addCo").dataset.touched = "1"; });
+$("#addForm").addEventListener("submit", e=>{
+  e.preventDefault();
+  const url = $("#addUrl").value.trim();
+  let ok = true; try { new URL(url); } catch(err){ ok = false; }
+  if (!ok){ $("#addHint").textContent = "That link doesn't look complete. Paste the full address starting with https://"; return; }
+  const company = $("#addCo").value.trim() || guessCompany(url) || "Other";
+  const title = $("#addRole").value.trim() || "Role from link";
+  const listed = JOBS.find(j=>j.url===url);
+  if (listed){ state.applied[listed.id] = new Date().toISOString(); }
+  else { state.manual = state.manual || []; state.manual.unshift({mid:String(Date.now()), company, title, url, at: new Date().toISOString(), status:"Applied"}); }
+  persist(); render(); dashPanel();
+  e.target.reset(); delete $("#addCo").dataset.touched;
+  $("#addHint").textContent = "Company is filled in from the link when it can be read. You can edit it before adding.";
+  toast(`Added ${listed?listed.company:company} to Applied`);
+});
+$("#copyLi").addEventListener("click", ()=>{
+  const url = $("#liUrl").textContent, btn = $("#copyLi");
+  const done = ()=>{ btn.textContent = "Copied"; setTimeout(()=>btn.textContent = "Copy", 1800); };
+  const fallback = ()=>{ const r = document.createRange(); r.selectNodeContents($("#liUrl")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = "Press Ctrl/Cmd+C"; setTimeout(()=>btn.textContent = "Copy", 2500); };
+  try { navigator.clipboard.writeText(url).then(done, fallback); } catch(e){ fallback(); }
+});
+</script>
+</body></html>
