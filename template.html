@@ -334,11 +334,7 @@ function dashPanel(){
 }
 document.addEventListener("click", e=>{
   const a = e.target.closest("[data-apply]");
-  if (a){ const id = a.dataset.apply, j = JOBS.find(x=>x.id===id);
-    state.applied[id] = new Date().toISOString(); delete state.saved[id]; persist();
-    setTimeout(()=>{ render(); dashPanel(); }, 0);
-    toast(`Moved ${j?j.company:"role"} to Applied`, ()=>{ delete state.applied[id]; persist(); render(); dashPanel(); });
-    return; }
+  if (a){ const id = a.dataset.apply; setTimeout(()=>askApplied(id), 0); return; }
   const b = e.target.closest("[data-act]");
   if (b){ const {act,id} = b.dataset; if (state[act][id]) delete state[act][id]; else state[act][id] = true; persist(); render(); dashPanel(); return; }
   const t = e.target.closest(".tab");
@@ -394,3 +390,4 @@ $("#copyPf").addEventListener("click", ()=>{
 });
 </script>
 <script src="cofilter.js"></script>
+<script src="applyprompt.js"></script>
