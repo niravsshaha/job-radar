@@ -109,7 +109,7 @@ aside{display:flex;flex-direction:column;gap:16px}
     <div>
       <h1>Nirav's Job Radar</h1>
       <p>US data engineering and data platform roles pulled from company job boards and ranked against your Yahoo experience: GCP, BigQuery, Airflow, SQL, Python, data quality and pipeline migrations.</p>
-      <div class="copybar"><span style="color:var(--muted);font-size:12px">LinkedIn</span><code id="liUrl">https://linkedin.com/in/niravsshaha2</code><button type="button" class="btn primary" id="copyLi">Copy</button></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"><div class="copybar" style="margin-top:0"><span style="color:var(--muted);font-size:12px">LinkedIn</span><code id="liUrl">https://linkedin.com/in/niravsshaha2</code><button type="button" class="btn primary" id="copyLi">Copy</button></div><div class="copybar" style="margin-top:0"><span style="color:var(--muted);font-size:12px">Portfolio</span><code id="pfUrl">https://niravsshaha.github.io/#skills</code><button type="button" class="btn primary" id="copyPf">Copy</button></div></div>
     </div>
     <div class="stamp">Snapshot __DATE__<br><span id="srcCount"></span></div>
   </header>
@@ -387,4 +387,10 @@ $("#copyLi").addEventListener("click", ()=>{
   try { navigator.clipboard.writeText(url).then(done, fallback); } catch(e){ fallback(); }
 });
 </script>
-<script src="cofilter.js"></script>
+<script src="cofilter.js">$("#copyPf").addEventListener("click", ()=>{
+  const url = $("#pfUrl").textContent, btn = $("#copyPf");
+  const done = ()=>{ btn.textContent = "Copied"; setTimeout(()=>btn.textContent = "Copy", 1800); };
+  const fallback = ()=>{ const r = document.createRange(); r.selectNodeContents($("#pfUrl")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = "Press Ctrl/Cmd+C"; setTimeout(()=>btn.textContent = "Copy", 2500); };
+  try { navigator.clipboard.writeText(url).then(done, fallback); } catch(e){ fallback(); }
+});
+</script>
