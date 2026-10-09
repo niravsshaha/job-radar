@@ -28,7 +28,10 @@ def gh(c):
     for j in (d or {}).get('jobs', []):
         t = j['title']
         if TITLE.search(t) and not EXCL.search(t):
-            out.append(dict(company=c, title=t, loc=(j.get('location') or {}).get('name', ''), url=j['absolute_url'],
+            loc = (j.get('location') or {}).get('name', '')
+            offs = '; '.join(o.get('name', '') for o in (j.get('offices') or []) if o.get('name'))
+            if offs and (VAGUE.match(loc) or not USPLACE.search(loc)): loc = offs
+            out.append(dict(company=c, title=t, loc=loc, url=j['absolute_url'],
                             updated=j.get('updated_at', ''), desc=html.unescape(j.get('content', '')), comp='', remote=None))
     return out
 
@@ -44,6 +47,10 @@ def ash(c):
     return out
 
 US = re.compile(r'united states|usa|\bus\b|u\.s\.|remote|new york|san francisco|seattle|austin|chicago|boston|denver|atlanta|dallas|los angeles|bay area|california|texas|washington|nyc|sf|mountain view|palo alto|menlo|sunnyvale|san jose|oakland|portland|miami|pittsburgh|philadelphia|salt lake|bellevue|cambridge|raleigh|minneapolis|nashville', re.I)
+# US-only filter: a role is kept only when its location names a US place or state.
+USPLACE = re.compile(r'united states|usa|u\.s\.|\bus\b|new york|nyc|san francisco|bay area|seattle|austin|chicago|boston|denver|atlanta|dallas|houston|los angeles|california|texas|mountain view|palo alto|menlo park|sunnyvale|san jose|san mateo|oakland|portland|miami|pittsburgh|philadelphia|salt lake|bellevue|raleigh|minneapolis|nashville|washington, dc|colorado springs|omaha|st\. louis', re.I)
+USSTATE = re.compile(r',\s*(AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY)\b')
+VAGUE = re.compile(r'^\s*(in-office|hybrid|remote|on-?site|office|flexible)?\s*$', re.I)
 NONUS = re.compile(r'london|uk\b|united kingdom|india|bengaluru|bangalore|hyderabad|pune|dublin|ireland|toronto|canada|vancouver|berlin|germany|paris|amsterdam|singapore|tokyo|sydney|australia|brazil|mexico|poland|warsaw|spain|madrid|tel aviv|israel|lisbon|portugal|emea|apac|latam|europe|japan|korea|seoul|philippines|argentina|colombia|costa rica|czech|romania|netherlands', re.I)
 
 # skill: (regex, weight, how much Nirav has it 0..1)
@@ -64,8 +71,8 @@ SAL = re.compile('\\$\\s?(\\d{2,3}(?:,\\d{3})+|\\d{2,3}k)\\s*(?:-|–|—|to)\\s
 def score(j):
     loc = j.get('loc') or ''
     d = strip(j.get('desc', ''))
-    if NONUS.search(loc) and not re.search(r'united states|\bus\b|usa|new york|san francisco', loc, re.I): return None
-    if not US.search(loc) and not re.search(r'remote', loc, re.I) and not re.search(r'united states|U\.S\.', d): return None
+    if NONUS.search(loc) and not USPLACE.search(loc): return None
+    if not (USPLACE.search(loc) or USSTATE.search(loc)): return None
     if SKIP_TITLE.search(j['title']): return None
     text = j['title'] + ' ' + d
     match, gap, tot, got = [], [], 0, 0
