@@ -57,7 +57,7 @@
     ["applied", "saved", "hidden", "manual"].forEach(function(k){ if (J(n[k]) !== J(state[k] || (k === "manual" ? [] : {}))) { state[k] = n[k]; changed = true; } });
     put(BASE, J(M));
     if (changed){
-      applying = true; put("radar", J(state)); applying = false;
+      applying = true; put("radar", J(state)); applying = false; lastApplied = J(state.applied || {});
       try { render(); } catch (e) {}
       try { if (typeof dashPanel === "function") dashPanel(); } catch (e) {}
     }
@@ -73,13 +73,14 @@
   function push(M, sha){
     var body = {message: "Sync applied list", content: enc(JSON.stringify({updated: new Date().toISOString(), entries: M}, null, 1))};
     if (sha) body.sha = sha;
-    return fetch(API, {method: "PUT", headers: Object.assign(hdr(), {"Content-Type": "application/json"}), body: J(body)}).then(function(r){
+    return fetch(API, {method: "PUT", headers: Object.assign(hdr(), {"Content-Type": "application/json"}), body: J(body), keepalive: J(body).length < 60000}).then(function(r){
       if (r.status === 409 || r.status === 422) throw new Error("conflict");
       if (!r.ok) throw new Error(r.status === 401 || r.status === 403 ? "token" : "HTTP " + r.status);
     });
   }
 
   function run(){
+    timer = null;
     if (busy){ again = true; return; }
     busy = true; show("Syncing…");
     var L = localMap();
@@ -89,20 +90,30 @@
       if (J(M) === J(R.entries)) return "ok";
       return push(M, R.sha).then(function(){ return "ok"; });
     }).then(function(res){
-      show(res === "ro" ? "Read-only" : "Synced " + when(Date.now()));
+      show(res === "ro" ? "Read-only" : (appliedPending ? "Applied synced ✓ " : "Synced ") + when(Date.now())); appliedPending = false;
     }).catch(function(e){
       if (e.message === "conflict") again = true;
       else show(e.message === "token" ? "Token rejected" : "Sync failed", true);
     }).then(function(){ busy = false; if (again){ again = false; setTimeout(run, 800); } });
   }
-  function soon(){ clearTimeout(timer); timer = setTimeout(run, 1200); }
+  function soon(ms){ clearTimeout(timer); timer = setTimeout(run, ms == null ? 1200 : ms); }
+  var lastApplied = J(state.applied || {}), appliedPending = false;
 
   // Every change the page saves locally also gets synced.
   Storage.prototype.setItem = function(k, v){
     rawSet.call(this, k, v);
-    if (!applying && k === "radar" && this === window.localStorage) soon();
+    if (applying || k !== "radar" || this !== window.localStorage) return;
+    // Marking a job applied (or undoing it) syncs right away; other changes are batched for a moment.
+    var a = J(state.applied || {});
+    if (a !== lastApplied){ lastApplied = a; appliedPending = true; soon(100); } else soon();
   };
-  document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible") soon(); });
+  document.addEventListener("visibilitychange", function(){
+    if (document.visibilityState === "visible") soon();
+    else if (timer){ clearTimeout(timer); timer = null; run(); }  // leaving the tab: send pending changes now
+  });
+  window.addEventListener("pagehide", function(){ if (timer){ clearTimeout(timer); timer = null; run(); } });
+  // Pick up changes made in your other browser while this tab stays open.
+  setInterval(function(){ if (document.visibilityState === "visible" && !busy) run(); }, tok() ? 45000 : 120000);
 
   // UI: a Sync button next to Refresh jobs, with a small panel for the token.
   function when(ms){ var d = new Date(ms); return d.toLocaleTimeString("en-US", {hour: "numeric", minute: "2-digit"}); }
