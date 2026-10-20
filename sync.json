@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-20T17:39:01.134Z",
+ "updated": "2026-10-20T17:39:05.038Z",
  "entries": {
   "a|https://boards.greenhouse.io/figma/jobs/5551686004?gh_jid=5551686004": {
    "v": true,
@@ -213,6 +213,14 @@
    },
    "t": 1792517940863
   },
+  "h|https://equifax.wd5.myworkdayjobs.com/External/job/USA---Georgia---Alpharetta---30005/Software-Engineer--Java-Big-Data-_J00179185": {
+   "v": {
+    "reason": "No visa sponsorship",
+    "note": "",
+    "at": "2026-10-20T17:39:03.536Z"
+   },
+   "t": 1792517944737
+  },
   "m|1792103598159": {
    "v": {
     "mid": "1792103598159",
@@ -242,10 +250,6 @@
   "h|https://equifax.wd5.myworkdayjobs.com/External/job/USA---Georgia---Alpharetta---30005/Software-Engineer_J00179183-1": {
    "v": null,
    "t": 1792517933520
-  },
-  "h|https://equifax.wd5.myworkdayjobs.com/External/job/USA---Georgia---Alpharetta---30005/Software-Engineer--Java-Big-Data-_J00179185": {
-   "v": null,
-   "t": 1792517931421
   },
   "a|https://nuro.ai/careersitem?gh_jid=7786596": {
    "v": null,
