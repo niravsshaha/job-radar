@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-20T17:38:38.808Z",
+ "updated": "2026-10-20T17:38:44.683Z",
  "entries": {
   "a|https://boards.greenhouse.io/figma/jobs/5551686004?gh_jid=5551686004": {
    "v": true,
@@ -213,6 +213,14 @@
    },
    "t": 1792517796096
   },
+  "h|https://generalmotors.wd5.myworkdayjobs.com/Careers_GM/job/Sunnyvale-California-United-States-of-America/Software-Engineer--AV-Logging-and-Observability_JR-202619953-1": {
+   "v": {
+    "reason": "No visa sponsorship",
+    "note": "",
+    "at": "2026-10-20T17:38:43.210Z"
+   },
+   "t": 1792517924412
+  },
   "m|1792103598159": {
    "v": {
     "mid": "1792103598159",
@@ -234,10 +242,6 @@
     "status": "Applied"
    },
    "t": 1792289948565
-  },
-  "h|https://generalmotors.wd5.myworkdayjobs.com/Careers_GM/job/Sunnyvale-California-United-States-of-America/Software-Engineer--AV-Logging-and-Observability_JR-202619953-1": {
-   "v": null,
-   "t": 1792517918542
   },
   "a|https://nuro.ai/careersitem?gh_jid=7786596": {
    "v": null,
