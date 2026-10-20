@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-20T17:38:53.839Z",
+ "updated": "2026-10-20T17:39:01.134Z",
  "entries": {
   "a|https://boards.greenhouse.io/figma/jobs/5551686004?gh_jid=5551686004": {
    "v": true,
@@ -205,6 +205,14 @@
    },
    "t": 1792517924412
   },
+  "h|https://equifax.wd5.myworkdayjobs.com/External/job/USA---Atlanta---One-Atlantic-Center/Data-Product-Owner_J00178421": {
+   "v": {
+    "reason": "No visa sponsorship",
+    "note": "",
+    "at": "2026-10-20T17:38:59.661Z"
+   },
+   "t": 1792517940863
+  },
   "m|1792103598159": {
    "v": {
     "mid": "1792103598159",
@@ -238,10 +246,6 @@
   "h|https://equifax.wd5.myworkdayjobs.com/External/job/USA---Georgia---Alpharetta---30005/Software-Engineer--Java-Big-Data-_J00179185": {
    "v": null,
    "t": 1792517931421
-  },
-  "h|https://equifax.wd5.myworkdayjobs.com/External/job/USA---Atlanta---One-Atlantic-Center/Data-Product-Owner_J00178421": {
-   "v": null,
-   "t": 1792517929138
   },
   "a|https://nuro.ai/careersitem?gh_jid=7786596": {
    "v": null,
