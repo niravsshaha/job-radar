@@ -199,6 +199,14 @@ SK = {
     'Scala/Java': (r'\bscala\b|\bjava\b', 3, 0.2), 'Go': (r'\bgolang\b|\bgo\b,', 2, 0), 'Terraform': (r'terraform', 2, 0.2), 'Dagster': (r'dagster', 2, 0.3),
 }
 strip = lambda s: re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', html.unescape(s or '')))
+# Years of experience a posting asks for: every "5+ years", "3-5 years", "at least 4 years", "5 years of ... experience";
+# the highest one is the real bar (e.g. "7+ years overall, 3+ years with Spark" -> 7).
+YRQ = re.compile('|'.join('(?:%s)' % p for p in (
+    r'(\d{1,2})\s*(?:\+|plus|or more)\s*(?:years?|yrs)', r'(\d{1,2})\s*(?:-|–|to)\s*\d{1,2}\s*(?:years?|yrs)',
+    r'(?:at least|minimum(?: of)?|min\.)\s*(\d{1,2})\s*(?:years?|yrs)', r'(\d{1,2})\s*(?:years?|yrs)(?:\s+of)?(?:\s+[\w/&.,-]+){0,5}?\s+experience')), re.I)
+def years_req(d):
+    v = [int(g) for m in YRQ.finditer(d) for g in m.groups() if g and 1 <= int(g) <= 15]
+    return max(v) if v else None
 SAL = re.compile('\\$\\s?(\\d{2,3}(?:,\\d{3})+|\\d{2,3}k)\\s*(?:-|–|—|to)\\s*\\$?\\s?(\\d{2,3}(?:,\\d{3})+|\\d{2,3}k)', re.I)
 
 def score(j):
@@ -230,7 +238,7 @@ def score(j):
         m = SAL.search(d)
         if m: sal = f"${m.group(1)} – ${m.group(2)}"
     return dict(src=j.get('src', ''), company=NAMES.get(j['company'], j['company'] if j.get('src') else j['company'].capitalize()), title=t, loc=loc.replace('•', ';')[:90], url=j['url'],
-                posted=(j.get('updated') or '')[:10], score=max(0, min(99, round(s))), level=lvl, years=y, salary=sal,
+                posted=(j.get('updated') or '')[:10], score=max(0, min(99, round(s))), level=lvl, years=years_req(d), salary=sal,
                 remote=bool(re.search(r'remote', loc, re.I)) or bool(j.get('remote')), match=match, gaps=gap)
 
 def main():

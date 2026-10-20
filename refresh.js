@@ -64,6 +64,9 @@
     var yrs = []; var yr = /(\d{1,2})\s*\+\s*years/g, ym;
     while ((ym = yr.exec(d))) { var n = +ym[1]; if (n >= 1 && n <= 15) yrs.push(n); }
     var y = yrs.length ? Math.min.apply(null, yrs) : null, t = j.title;
+    // Shown and filtered on: the highest experience the posting asks for (same rule as radar.py).
+    var YRQ = /(\d{1,2})\s*(?:\+|plus|or more)\s*(?:years?|yrs)|(\d{1,2})\s*(?:-|\u2013|to)\s*\d{1,2}\s*(?:years?|yrs)|(?:at least|minimum(?: of)?|min\.)\s*(\d{1,2})\s*(?:years?|yrs)|(\d{1,2})\s*(?:years?|yrs)(?:\s+of)?(?:\s+[\w\/&.,-]+){0,5}?\s+experience/gi, yq, yreq = null;
+    while ((yq = YRQ.exec(d))) { for (var gi = 1; gi <= 4; gi++) { var gv = +yq[gi]; if (yq[gi] && gv >= 1 && gv <= 15 && (yreq === null || gv > yreq)) yreq = gv; } }
     var lvl = /staff|principal|lead/i.test(t) ? "Staff+" : (/senior|sr\.?\b|\biii\b|\biv\b/i.test(t) ? "Senior" : "Mid");
     sc -= lvl === "Staff+" ? 25 : (lvl === "Senior" ? 5 : 0);
     sc -= (y && y >= 8) ? 15 : ((y && y >= 6) ? 6 : 0);
@@ -72,7 +75,7 @@
     var sal = j.comp || "";
     if (!sal) { var sm = SAL.exec(d); if (sm) sal = "$" + sm[1] + " – $" + sm[2]; }
     return {company: NAMES[j.company] || cap(j.company), title: t, loc: loc.split("•").join(";").slice(0, 90), url: j.url,
-      posted: (j.updated || "").slice(0, 10), score: Math.max(0, Math.min(99, Math.round(sc))), level: lvl, years: y, salary: sal,
+      posted: (j.updated || "").slice(0, 10), score: Math.max(0, Math.min(99, Math.round(sc))), level: lvl, years: yreq, salary: sal,
       remote: /remote/i.test(loc) || !!j.remote, match: match, gaps: gap};
   }
 
