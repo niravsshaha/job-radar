@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-20T17:38:51.674Z",
+ "updated": "2026-10-20T17:38:53.839Z",
  "entries": {
   "a|https://boards.greenhouse.io/figma/jobs/5551686004?gh_jid=5551686004": {
    "v": true,
@@ -177,14 +177,6 @@
    "v": "2026-10-20T17:14:27.290Z",
    "t": 1792516467441
   },
-  "h|https://equifax.wd5.myworkdayjobs.com/External/job/USA---Georgia---Alpharetta---30005/Software-Engineer--Java-and-Big-Data-_J00179186": {
-   "v": true,
-   "t": 1792514165488
-  },
-  "h|https://equifax.wd5.myworkdayjobs.com/External/job/USA---Georgia---Alpharetta---30005/Software-Engineer_J00179183-1": {
-   "v": true,
-   "t": 1792514180646
-  },
   "h|https://verizon.wd12.myworkdayjobs.com/verizon-careers/job/Irving-Texas/AI-Platform-Engineer_R-1101077-1": {
    "v": true,
    "t": 1792514196310
@@ -234,6 +226,14 @@
     "status": "Applied"
    },
    "t": 1792289948565
+  },
+  "h|https://equifax.wd5.myworkdayjobs.com/External/job/USA---Georgia---Alpharetta---30005/Software-Engineer--Java-and-Big-Data-_J00179186": {
+   "v": null,
+   "t": 1792517933520
+  },
+  "h|https://equifax.wd5.myworkdayjobs.com/External/job/USA---Georgia---Alpharetta---30005/Software-Engineer_J00179183-1": {
+   "v": null,
+   "t": 1792517933520
   },
   "h|https://equifax.wd5.myworkdayjobs.com/External/job/USA---Georgia---Alpharetta---30005/Software-Engineer--Java-Big-Data-_J00179185": {
    "v": null,
