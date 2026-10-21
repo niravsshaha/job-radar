@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-21T22:12:07.027Z",
+ "updated": "2026-10-21T22:13:17.426Z",
  "entries": {
   "a|https://boards.greenhouse.io/figma/jobs/5551686004?gh_jid=5551686004": {
    "v": true,
@@ -189,10 +189,6 @@
    "v": "2026-10-20T21:12:38.429Z",
    "t": 1792530758591
   },
-  "a|https://equifax.wd5.myworkdayjobs.com/External/job/USA---Georgia---Alpharetta---30005/Software-Engineer_J00179910": {
-   "v": "2026-10-21T22:11:36.396Z",
-   "t": 1792620696542
-  },
   "h|https://verizon.wd12.myworkdayjobs.com/verizon-careers/job/Irving-Texas/AI-Platform-Engineer_R-1101077-1": {
    "v": true,
    "t": 1792514196310
@@ -290,6 +286,10 @@
     "status": "Applied"
    },
    "t": 1792289948565
+  },
+  "a|https://equifax.wd5.myworkdayjobs.com/External/job/USA---Georgia---Alpharetta---30005/Software-Engineer_J00179910": {
+   "v": null,
+   "t": 1792620797048
   },
   "a|https://nuro.ai/careersitem?gh_jid=7786596": {
    "v": null,
