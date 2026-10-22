@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-22T04:43:26.592Z",
+ "updated": "2026-10-22T04:43:54.596Z",
  "entries": {
   "a|https://boards.greenhouse.io/figma/jobs/5551686004?gh_jid=5551686004": {
    "v": true,
@@ -225,10 +225,6 @@
    "v": "2026-10-22T02:55:55.771Z",
    "t": 1792637755936
   },
-  "a|https://jobs.smartrecruiters.com/WesternDigital/744000142878952-software-engineer-apps-": {
-   "v": "2026-10-22T04:42:52.821Z",
-   "t": 1792644172963
-  },
   "h|https://verizon.wd12.myworkdayjobs.com/verizon-careers/job/Irving-Texas/AI-Platform-Engineer_R-1101077-1": {
    "v": true,
    "t": 1792514196310
@@ -342,6 +338,10 @@
     "status": "Applied"
    },
    "t": 1792289948565
+  },
+  "a|https://jobs.smartrecruiters.com/WesternDigital/744000142878952-software-engineer-apps-": {
+   "v": null,
+   "t": 1792644234344
   },
   "a|https://mastercard.wd1.myworkdayjobs.com/CorporateCareers/job/Arlington-Virginia/Software-Engineer-II_R-293167": {
    "v": null,
