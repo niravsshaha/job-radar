@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-22T04:44:09.285Z",
+ "updated": "2026-10-22T04:46:35.302Z",
  "entries": {
   "a|https://boards.greenhouse.io/figma/jobs/5551686004?gh_jid=5551686004": {
    "v": true,
@@ -324,6 +324,14 @@
     "at": "2026-10-22T04:44:07.834Z"
    },
    "t": 1792644249036
+  },
+  "h|https://job-boards.greenhouse.io/honeycomb/jobs/5452584008": {
+   "v": {
+    "reason": "Tech stack mismatch",
+    "note": "",
+    "at": "2026-10-22T04:46:33.865Z"
+   },
+   "t": 1792644395068
   },
   "m|1792103598159": {
    "v": {
