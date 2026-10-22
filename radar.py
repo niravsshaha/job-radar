@@ -7,9 +7,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 P = lambda f: os.path.join(HERE, f)
 
 # Companies to search. Greenhouse board slugs and Ashby board slugs.
-GH = """abnormalsecurity adyen affirm airbnb airtable akunacapital algolia alloy alphasights anthropic appian applovin asana attentive axios axon betterment billcom bitgo bitwarden blend block blockchain bloomreach braze brex buildkite builtin calendly calm carta carvana chainguard checkr chime clear cloudflare cockroachlabs coinbase collibra consensys contentful coreweave coupang coursera current databricks datadog dataiku deliveroo descript dialpad discord doordashusa doximity dremio dropbox druva duolingo earnin elastic epicgames everlaw faire fanduel fastly fetch figma fireblocks fivetran flatironhealth flexport forter fubotv gemini gitlab gocardless gofundme grafanalabs greenhouse gusto hellofresh honeycomb hudl imc imply instacart intercom invisible janestreet jfrog jumptrading justworks khanacademy kickstarter klaviyo komodohealth labelbox lattice launchdarkly lithic lucidmotors lyft masterclass medium melio mercury mirakl mixpanel modernhealth mongodb monzo mozilla neo4j netlify netskope newrelic newsela nextdoor nextroll nuro offerup okta onemedical oscar oura pagerduty peloton pendo pinterest planetlabs prizepicks purestorage qualtrics reddit redwoodmaterials relativity riotgames ripple robinhood roblox rocketlab rubrik samsara scaleai scopely seatgeek sendbird sigmacomputing singlestore smartsheet snorkelai sofi splice squarespace stabilityai starburst stitchfix stripe sumologic sweetgreen tanium taskrabbit tide toast tripadvisor twilio twitch udacity udemy underdog upgrade upstart vercel verkada via waymo webflow wikimedia workato yext yugabyte zocdoc zscaler zuora""".split()
-ASH = """airbyte alchemy amplitude anyscale applied ashby benchling brightwheel bubble cerebras character circle classdojo clearco clickup cohere confluent cursor deepgram docker drata dune eightsleep elevenlabs envoy expensify flock hackerone handshake harvey headway hex hightouch hopper incident iterable kayak linear mapbox materialize modal motherduck mux neon nerdwallet notion nuna openai orca patreon paxos perplexity persona pinecone plaid poshmark posthog quora railway ramp recharge render replit runway sardine sentilink sentry sift skydio snapdocs snowflake snyk sonder strava supabase tekion temporal thumbtack vanta vivid warp watershed weave xero zapier zip""".split()
-LEV = """aircall anchorage arcadia binance gopuff metabase outreach palantir pipedrive ro spotify tala veeva wealthfront zoox""".split()
+GH = """6sense abacus abnormalsecurity adyen affirm airbnb airship airtable akunacapital algolia alloy alpaca alphasights anaplan anthropic appian applovin apptronik asana attentive aura axios axon axonius backblaze betterment billcom bitgo bitwarden blend blinkhealth block blockchain bloomreach boxinc branch brave braze brex bugcrowd buildkite buildops builtin calendly calm cameo careem carta carvana chainguard checkr chime circleci clear clever cloudflare coalition cockroachlabs cognite coinbase collibra consensys contentful coreweave coupang coursera current dashlane databento databricks datadog dataiku deliveroo descript devrev dialpad discord doordashusa doximity dremio dropbox druva duolingo earnest earnin elastic epicgames epirus esri everlane everlaw expel extend faire fanduel fastly federato fetch fieldwire figma fireblocks fivetran flatironhealth fleetio flexport flowcode formlabs forter freenome fubotv gemini gitlab gocardless gofundme grafanalabs gravity greenhouse gusto hellofresh honeycomb honor hover hudl huntress imc imply instacart instawork insurify intercom invisible janestreet jfrog jumptrading justworks kaseya khanacademy kickstarter klaviyo knowbe4 komodohealth labelbox lattice launchdarkly liftoff lightmatter lithic logicgate lucidmotors lyft masterclass mavenclinic medium melio mercury mindbody mirakl mixpanel modernhealth moloco mongodb monzo mozilla nayya neo4j netlify netskope neuralink newrelic newsela nextdoor nextroll nooks nuro offerup okta onemedical oscar oura pagerduty peloton pendo pinterest planetlabs planetscale prenuvo prizepicks purestorage qualia qualtrics quince reddit redwoodmaterials relativity riotgames ripple robinhood roblox rocketlab roku rubrik salesloft samsara scaleai scopely seatgeek sendbird sigmacomputing simplisafe singlestore smartrent smartsheet snorkelai sofi splice squarespace stabilityai stackadapt stackblitz starburst stitchfix stripe sumologic sumup sweetgreen tailscale tanium taskrabbit taxbit tebra tide toast tripactions tripadvisor truebill twilio twitch udacity udemy underdog upgrade upstart vercel verkada via waymo webflow wikimedia wonderschool workato wrike xometry yext yotpo yugabyte zocdoc zscaler zuora""".split()
+ASH = """1password abridge acorns airbyte airwallex alchemy amplitude andela anyscale appfolio applied aptible ashby astronomer attio benchling benevity brightwheel brigit bubble buildops cambly cerebras character circle citizen classdojo clearco clickhouse clickup close clubhouse cognition cohere collective commure conductor confluent crusoe cursor dandy decagon deepgram delinea dispatch docker drata dune eightsleep elevenlabs envoy expensify extend flock glide graphite hackerone handshake harvey headway hex hightouch hopper incident indigo influxdata insitro iterable jobber kayak kin lemonade level linear mapbox materialize maven mercor merge modal montecarlodata motherduck multiverse mural mutiny mux neon nerdwallet nooks notion nubank numeric nuna nylas onebrief openai orb orca outschool overjet owner parafin patreon paxos perplexity persona photoroom pinecone plaid playground poshmark posthog prefect primer qumulo quora radiant railway ramp recharge redis render replit resend rho rula runway sardine secureframe semgrep sentilink sentry shift sierra sift skydio slope snapdocs snowflake snyk sonder sprig strava substack suno supabase synthesia tabs tekion temporal tennr thumbtack titan tracksuit unit upside vanta vise vivid warp watershed wealthsimple weave whoop writer xero zapier zip""".split()
+LEV = """activecampaign aircall anchorage angellist arcadia basis binance captivateiq emburse everbridge goodleap gopuff houzz jumpcloud linkedin metabase olo outreach palantir peerspace pipedrive ro rover spotify tala toptal veeva voltus wealthfront zeta zoox""".split()
 # Workday career sites: name|tenant|wd number|site (checked only in the daily build; Workday blocks browser requests)
 WD = [l.split("|") for l in """Salesforce|salesforce|12|External_Career_Site
 Nvidia|nvidia|5|NVIDIAExternalCareerSite
@@ -66,7 +66,54 @@ Abbott|abbott|5|abbottcareers
 Johnson & Johnson|jj|5|JJ
 Elevance|elevancehealth|1|ANT
 Cigna|cigna|5|cignacareers
-Visa|visa|5|Visa""".splitlines()]
+Visa|visa|5|Visa
+Chevron|chevron|5|jobs
+3M|3m|1|Search
+Northrop Grumman|ngc|1|Northrop_Grumman_External_Site
+RTX|globalhr|5|REC_RTX_Ext_Gateway
+GE Aerospace|geaerospace|5|GE_ExternalSite
+Caterpillar|cat|5|CaterpillarCareers
+Centene|centene|5|Centene_External
+Merck|msd|5|SearchJobs
+Bristol Myers Squibb|bristolmyerssquibb|5|BMS
+Moderna|modernatx|1|M_tx
+Amgen|amgen|1|Careers
+Gilead|gilead|1|gileadcareers
+Regeneron|regeneron|1|Careers
+Illumina|illumina|1|illumina-careers
+Applied Materials|amat|1|External
+KLA|kla|1|Search
+Marvell|marvell|1|MarvellCareers
+US Bank|usbank|1|US_Bank_Careers
+PNC|pnc|5|External
+Truist|truist|1|Careers
+Fannie Mae|fanniemae|1|FannieMaeCareers
+Freddie Mac|freddiemac|5|External
+State Street|statestreet|1|Global
+Northern Trust|ntrs|1|northerntrust
+T. Rowe Price|troweprice|5|TRowePrice
+BlackRock|blackrock|1|BlackRock_Professional
+Travelers|travelers|5|External
+Nationwide|nationwide|1|Nationwide_Career
+Prudential|pru|5|Careers
+AT&T|att|1|ATTGeneral
+McKesson|mckesson|3|External_Careers
+Cardinal Health|cardinalhealth|1|EXT
+Chewy|chewy|5|External
+Citi|citi|5|2
+Mondelez|mdlz|3|External
+Coca-Cola|coke|1|coca-cola-careers
+Procter & Gamble|pg|5|1000
+Johnson Controls|jci|5|JCI
+General Dynamics|gdit|5|External_Career_Site
+Booz Allen|bah|1|BAH_Jobs
+Leidos|leidos|5|External
+CACI|caci|1|External
+Fiserv|fiserv|5|EXT
+FIS|fis|5|SearchJobs
+Global Payments|tsys|1|TSYS
+Equinix|equinix|1|External
+UPS|hcmportal|5|Search""".splitlines()]
 SR = """ServiceNow BoschGroup Canva Experian WesternDigital Freshworks AbbVie""".split()  # SmartRecruiters company ids
 WD_TERMS = ["data engineer", "software engineer", "analytics engineer", "data platform"]
 
@@ -167,6 +214,124 @@ def sr(c):
                             desc=desc, comp="", remote=bool((p.get("location") or {}).get("remote")), src="sr"))
     return out
 
+# Jooble collects listings from many boards (LinkedIn, Indeed, ZipRecruiter, Glassdoor, staffing firms).
+# It needs a free key stored as the GitHub Actions secret JOOBLE_KEY; without it this source is skipped.
+AGG_TERMS = ["data engineer", "analytics engineer", "data platform engineer", "big data engineer", "etl developer", "backend engineer python"]
+CORP = re.compile(r'[,.]?\s*\b(inc|llc|ltd|corp|corporation|co|company|incorporated)\b\.?$', re.I)
+
+def jooble():
+    key = os.environ.get("JOOBLE_KEY")
+    if not key: return []
+    out = []
+    for term in AGG_TERMS:
+        for page in range(1, 4):
+            d = post(f"https://jooble.org/api/{key}", {"keywords": term, "location": "United States", "page": str(page)}) or {}
+            js = d.get("jobs") or []
+            for r in js:
+                t = html.unescape(r.get("title", ""))
+                if not TITLE.search(t) or EXCL.search(t): continue
+                loc = r.get("location") or "United States"
+                if not (USPLACE.search(loc) or USSTATE.search(loc)): loc += ", United States"
+                out.append(dict(company=CORP.sub("", html.unescape(r.get("company") or "")).strip() or "Unknown", title=t, loc=loc,
+                                url=r.get("link", ""), updated=r.get("updated", ""), desc=r.get("snippet", ""), comp=r.get("salary") or "",
+                                remote=bool(re.search(r"remote", t + " " + loc + " " + (r.get("type") or ""), re.I)), src="jooble"))
+            if len(js) < 20: break
+    return out
+
+# Big tech career sites (public JSON behind their own search pages).
+BIG_TERMS = ["data engineer", "analytics engineer", "data platform", "software engineer data", "big data"]
+
+def amazon():
+    out, seen = [], set()
+    for term in BIG_TERMS:
+        for off in range(0, 300, 100):
+            q = urllib.parse.urlencode({"base_query": term, "country": "USA", "result_limit": 100, "offset": off, "sort": "recent"})
+            js = (get(f"https://www.amazon.jobs/en/search.json?{q}") or {}).get("jobs") or []
+            for r in js:
+                t = r.get("title", "")
+                if r.get("id") in seen or not TITLE.search(t) or EXCL.search(t): continue
+                seen.add(r.get("id"))
+                try: up = datetime.datetime.strptime(r.get("posted_date", ""), "%B %d, %Y").strftime("%Y-%m-%d")
+                except Exception: up = ""
+                out.append(dict(company="Amazon", title=t, loc=r.get("normalized_location") or r.get("location", ""), url="https://www.amazon.jobs" + r.get("job_path", ""),
+                                updated=up, desc=" ".join(r.get(k) or "" for k in ("description", "basic_qualifications", "preferred_qualifications")),
+                                comp="", remote=False, src="big"))
+            if len(js) < 100: break
+    return out
+
+def microsoft():
+    base, out, ids = "https://apply.careers.microsoft.com/api/pcsx", [], {}
+    for term in BIG_TERMS:
+        for start in range(0, 100, 10):
+            q = urllib.parse.urlencode({"domain": "microsoft.com", "query": term, "location": "United States", "start": start})
+            ps = ((retry(get, f"{base}/search?{q}") or {}).get("data") or {}).get("positions") or []
+            __import__("time").sleep(0.5)  # Microsoft rate-limits fast clients
+            for p in ps:
+                t = p.get("name", "")
+                if TITLE.search(t) and not EXCL.search(t) and any(x == "US" or x.endswith(", US") for x in (p.get("standardizedLocations") or [])): ids.setdefault(p["id"], p)
+            if len(ps) < 10: break
+    for pid, p in list(ids.items())[:100]:
+        __import__("time").sleep(0.5)
+        d = (retry(get, f"{base}/position_details?" + urllib.parse.urlencode({"position_id": pid, "domain": "microsoft.com", "hl": "en"})) or {}).get("data") or {}
+        locs = "; ".join(p.get("locations") or [])
+        out.append(dict(company="Microsoft", title=p.get("name", ""), loc=locs if USPLACE.search(locs) else (locs + ", United States").strip(", "),
+                        url=d.get("publicUrl") or "https://apply.careers.microsoft.com" + p.get("positionUrl", ""),
+                        updated=datetime.datetime.fromtimestamp(int(p.get("postedTs") or 0), datetime.timezone.utc).strftime("%Y-%m-%d") if p.get("postedTs") else "",
+                        desc=d.get("jobDescription") or "", comp="", remote=(p.get("workLocationOption") == "remote"), src="big"))
+    return out
+
+def google():
+    out, seen = [], set()
+    for term in BIG_TERMS:
+        for page in range(1, 6):
+            q = urllib.parse.urlencode({"q": term, "location": "United States", "page": page})
+            try:
+                s = urllib.request.urlopen(urllib.request.Request(f"https://www.google.com/about/careers/applications/jobs/results/?{q}", headers=UA), timeout=25).read().decode("utf-8", "replace")
+                i = s.index("AF_initDataCallback({key: 'ds:1'"); a = s.index("data:", i) + 5; b = s.index(", sideChannel", a)
+                jobs = (json.loads(s[a:b]) or [[]])[0] or []
+            except Exception:
+                break
+            for x in jobs:
+                t = x[1] or ""
+                if x[0] in seen or not TITLE.search(t) or EXCL.search(t): continue
+                seen.add(x[0])
+                locs = [l[0] for l in (x[9] or []) if l and l[0]]
+                if not any(l[-1] == "US" for l in (x[9] or []) if l): continue
+                txt = lambda v: (v[1] if isinstance(v, list) and len(v) > 1 and v[1] else "")
+                out.append(dict(company="Google", title=t, loc="; ".join(locs), url=f"https://www.google.com/about/careers/applications/jobs/results/{x[0]}",
+                                updated=datetime.datetime.fromtimestamp((x[12] or [0])[0], datetime.timezone.utc).strftime("%Y-%m-%d") if x[12] else "",
+                                desc=" ".join(txt(x[k]) for k in (3, 4, 10, 19)), comp="", remote=bool(re.search(r"remote", t, re.I)), src="big"))
+            if len(jobs) < 20: break
+    return out
+
+def apple():
+    out, seen = [], set()
+    try:
+        r = urllib.request.urlopen(urllib.request.Request("https://jobs.apple.com/api/v1/CSRFToken", headers=UA), timeout=25)
+        tok, ck = r.headers.get("x-apple-csrf-token", ""), "; ".join(c.split(";")[0] for c in r.headers.get_all("Set-Cookie") or [])
+    except Exception:
+        return out
+    hdr = {**UA, "x-apple-csrf-token": tok, "Cookie": ck, "Content-Type": "application/json", "Origin": "https://jobs.apple.com", "Referer": "https://jobs.apple.com/en-us/search"}
+    for term in BIG_TERMS:
+        for page in range(1, 6):
+            body = {"query": term, "filters": {"postingpostLocation": ["postLocation-USA"]}, "page": page, "locale": "en-us", "sort": "relevance",
+                    "format": {"longDate": "MMMM D, YYYY", "mediumDate": "MMM D, YYYY"}}
+            try:
+                res = json.load(urllib.request.urlopen(urllib.request.Request("https://jobs.apple.com/api/v1/search", data=json.dumps(body).encode(), headers=hdr), timeout=25))["res"]
+            except Exception:
+                break
+            rs = res.get("searchResults") or []
+            for x in rs:
+                t = x.get("postingTitle", "")
+                locs = x.get("locations") or []
+                if x.get("id") in seen or not TITLE.search(t) or EXCL.search(t) or not any(l.get("countryID") == "iso-country-USA" or l.get("countryName") == "United States" for l in locs): continue
+                seen.add(x.get("id"))
+                out.append(dict(company="Apple", title=t, loc="; ".join(filter(None, (", ".join(filter(None, (l.get("city"), l.get("stateProvince")))) or l.get("name", "") for l in locs))) + ", United States",
+                                url=f"https://jobs.apple.com/en-us/details/{x.get('positionId')}/{x.get('transformedPostingTitle', '')}",
+                                updated=(x.get("postDateInGMT") or "")[:10], desc=x.get("jobSummary", ""), comp="", remote=bool(x.get("homeOffice")), src="big"))
+            if len(rs) < 20: break
+    return out
+
 def ash(c):
     d = get(f"https://api.ashbyhq.com/posting-api/job-board/{c}?includeCompensation=true")
     out = []
@@ -244,8 +409,17 @@ def score(j):
 def main():
     with cf.ThreadPoolExecutor(24) as ex:
         raw = [x for lst in list(ex.map(gh, GH)) + list(ex.map(ash, ASH)) + list(ex.map(lev, LEV)) + list(ex.map(sr, SR)) for x in lst]
-    with cf.ThreadPoolExecutor(6) as ex:  # fewer parallel Workday sites to avoid throttling
+    with cf.ThreadPoolExecutor(8) as ex:  # fewer parallel Workday sites to avoid throttling
         raw += [x for lst in ex.map(wd, WD) for x in lst]
+    # Aggregator listings often repeat a company-board posting; keep the company-board copy.
+    nk = lambda c, t: re.sub(r"[^a-z0-9]", "", (c + "|" + t).lower())
+    direct = {nk(NAMES.get(j["company"], j["company"]), j["title"]) for j in raw}
+    for f in (amazon, microsoft, google, apple):
+        try: raw += f()
+        except Exception as e: print(f.__name__, "failed:", e)
+    for j in jooble():
+        k = nk(j["company"], j["title"])
+        if k not in direct: direct.add(k); raw.append(j)
     if not raw:
         sys.exit("No jobs fetched; keeping the previous dashboard.")
     prev = set()

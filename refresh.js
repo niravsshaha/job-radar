@@ -130,7 +130,7 @@
         seen.add(k); o.isNew = !prev.has(o.url); out.push(o);
       });
       JOBS.forEach(function(j){
-        if (j.src !== "wd" && j.src !== "sr") return;
+        if (!j.src) return;  // Workday, SmartRecruiters, big-tech sites, Jooble: only the daily build fetches these
         var k = j.company + "|" + j.title + "|" + j.loc;
         if (!seen.has(k)) { seen.add(k); out.push(Object.assign({}, j, {isNew: false})); }
       });
