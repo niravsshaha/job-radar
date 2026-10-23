@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install headless browser (for Meta careers; the build still runs if this fails)
+        run: pip install playwright && python -m playwright install --with-deps chromium || true
       - name: Rebuild dashboard
         run: python3 radar.py
         env:  # optional free Jooble key, saved under Settings → Secrets and variables → Actions
