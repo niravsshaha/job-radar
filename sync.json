@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-23T02:10:41.941Z",
+ "updated": "2026-10-23T02:12:04.394Z",
  "entries": {
   "a|https://boards.greenhouse.io/figma/jobs/5551686004?gh_jid=5551686004": {
    "v": true,
@@ -241,10 +241,6 @@
    "v": "2026-10-23T02:04:33.126Z",
    "t": 1792721073364
   },
-  "a|https://bah.wd1.myworkdayjobs.com/BAH_Jobs/job/Fayetteville-NC/Data-Engineer_R0236980": {
-   "v": "2026-10-23T02:10:40.751Z",
-   "t": 1792721440982
-  },
   "h|https://verizon.wd12.myworkdayjobs.com/verizon-careers/job/Irving-Texas/AI-Platform-Engineer_R-1101077-1": {
    "v": true,
    "t": 1792514196310
@@ -390,6 +386,10 @@
     "status": "Applied"
    },
    "t": 1792289948565
+  },
+  "a|https://bah.wd1.myworkdayjobs.com/BAH_Jobs/job/Fayetteville-NC/Data-Engineer_R0236980": {
+   "v": null,
+   "t": 1792721524070
   },
   "a|https://jobs.smartrecruiters.com/WesternDigital/744000142878952-software-engineer-apps-": {
    "v": null,
