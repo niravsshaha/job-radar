@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-23T02:25:51.954Z",
+ "updated": "2026-10-23T02:27:11.740Z",
  "entries": {
   "a|https://boards.greenhouse.io/figma/jobs/5551686004?gh_jid=5551686004": {
    "v": true,
@@ -257,10 +257,6 @@
    "v": "2026-10-23T02:25:30.305Z",
    "t": 1792722330545
   },
-  "a|https://bah.wd1.myworkdayjobs.com/BAH_Jobs/job/Fort-Belvoir-VA/Data-Engineer_R0251749": {
-   "v": "2026-10-23T02:25:51.321Z",
-   "t": 1792722351558
-  },
   "h|https://verizon.wd12.myworkdayjobs.com/verizon-careers/job/Irving-Texas/AI-Platform-Engineer_R-1101077-1": {
    "v": true,
    "t": 1792514196310
@@ -430,6 +426,10 @@
     "status": "Applied"
    },
    "t": 1792289948565
+  },
+  "a|https://bah.wd1.myworkdayjobs.com/BAH_Jobs/job/Fort-Belvoir-VA/Data-Engineer_R0251749": {
+   "v": null,
+   "t": 1792722431311
   },
   "a|https://coke.wd1.myworkdayjobs.com/coca-cola-careers/job/US---GA---Atlanta/Software-Engineer_R-147407": {
    "v": null,
