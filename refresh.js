@@ -1,7 +1,7 @@
 // "Refresh jobs": re-checks every company job board from the browser and rescores the roles.
 (function(){
   var TITLE = /data|analytics|etl|elt|pipeline|warehouse|lakehouse|business intelligence|\bbi\b|ml platform|ml infra|machine learning (platform|infra)|backend|back-end|software engineer|platform engineer|infrastructure engineer/i;
-  var EXCL = /manager|director|head of|vp|principal|intern|scientist|analyst|sales|account|solutions|customer|support|recruit|counsel|marketing|product manager|designer/i;
+  var EXCL = /manager|director|head of|vp|principal|intern|scientist|(?<!data )(?<!intelligence )(?<!bi )(?<!analytics )analyst|sales|account|solutions|customer|support|recruit|counsel|marketing|product manager|designer/i;
   var SKIP_TITLE = /product management|network|machine learning engineer|research engineer|field engineer|security|hardware|full-stack|frontend/i;
   var USPLACE = /united states|usa|u\.s\.|\bus\b|new york|nyc|san francisco|bay area|seattle|austin|chicago|boston|denver|atlanta|dallas|houston|los angeles|california|texas|mountain view|palo alto|menlo park|sunnyvale|san jose|san mateo|oakland|portland|miami|pittsburgh|philadelphia|salt lake|bellevue|raleigh|minneapolis|nashville|washington, dc|colorado springs|omaha|st\. louis/i;
   var USSTATE = /,\s*(AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY)\b/;

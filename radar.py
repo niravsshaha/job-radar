@@ -129,13 +129,15 @@ Danaher|danaher|1|DanaherJobs
 Novartis|novartis|3|Novartis_Careers
 GSK|gsk|5|GSKCareers
 AstraZeneca|astrazeneca|3|Careers
-Sanofi|sanofi|3|SanofiCareers""".splitlines()]
+Sanofi|sanofi|3|SanofiCareers
+Expedia|expedia|108|search
+Samsung|sec|3|Samsung_Careers""".splitlines()]
 SR = """ServiceNow BoschGroup Canva Experian WesternDigital Freshworks AbbVie""".split()  # SmartRecruiters company ids
 WD_TERMS = ["data engineer", "software engineer", "analytics engineer", "data platform"]
 
 UA = {'User-Agent': 'Mozilla/5.0'}
 TITLE = re.compile(r'data|analytics|etl|elt|pipeline|warehouse|lakehouse|business intelligence|\bbi\b|ml platform|ml infra|machine learning (platform|infra)|backend|back-end|software engineer|platform engineer|infrastructure engineer', re.I)
-EXCL = re.compile(r'manager|director|head of|vp|principal|intern|scientist|analyst|sales|account|solutions|customer|support|recruit|counsel|marketing|product manager|designer', re.I)
+EXCL = re.compile(r'manager|director|head of|vp|principal|intern|scientist|(?<!data )(?<!intelligence )(?<!bi )(?<!analytics )analyst|sales|account|solutions|customer|support|recruit|counsel|marketing|product manager|designer', re.I)
 SKIP_TITLE = re.compile(r'product management|network|machine learning engineer|research engineer|field engineer|security|hardware|full-stack|frontend|embedded|firmware|flight software|avionics|datacenter|data center|consultant', re.I)
 MIN_SCORE = 40  # roles below this fit score are dropped; the page has its own fit filter
 NAMES = {'doordashusa': 'DoorDash', 'scaleai': 'Scale AI', 'openai': 'OpenAI', 'sigmacomputing': 'Sigma Computing', 'prizepicks': 'PrizePicks', 'gitlab': 'GitLab', 'mongodb': 'MongoDB'}
@@ -255,7 +257,7 @@ def jooble():
     return out
 
 # Big tech career sites (public JSON behind their own search pages).
-BIG_TERMS = ["data engineer", "analytics engineer", "data platform", "software engineer data", "big data"]
+BIG_TERMS = ["data engineer", "analytics engineer", "data platform", "software engineer data", "big data", "data analyst", "business intelligence"]
 
 def amazon():
     out, seen = [], set()
@@ -349,7 +351,9 @@ def apple():
     return out
 
 # Oracle Recruiting Cloud sites: name | host | site number
-ORA = [("JPMorgan Chase", "jpmc.fa.oraclecloud.com", "CX_1001"), ("Oracle", "eeho.fa.us2.oraclecloud.com", "CX_45001")]
+ORA = [("JPMorgan Chase", "jpmc.fa.oraclecloud.com", "CX_1001"), ("Oracle", "eeho.fa.us2.oraclecloud.com", "CX_45001"),
+       ("American Express", "egug.fa.us2.oraclecloud.com", "CX_1"), ("Honeywell", "ibqbjb.fa.ocs.oraclecloud.com", "CX_1"),
+       ("Kroger", "eluq.fa.us2.oraclecloud.com", "CX_2001"), ("Dell", "enterpriseplatform.dell.com", "CX_1")]
 
 def oracle_hcm(entry):
     name, host, site = entry
@@ -478,6 +482,91 @@ def meta():
         b.close()
     return out
 
+# Career sites on Jibe (their robots.txt allow it, with a 5 s crawl delay)
+JIBE = [("AMD", "careers.amd.com"), ("Rivian", "careers.rivian.com"), ("Booking.com", "jobs.booking.com"), ("Costco", "careers.costco.com")]
+
+def jibe(entry):
+    name, host = entry
+    out, seen, sleep = [], set(), __import__("time").sleep
+    for term in BIG_TERMS:
+        for page in range(1, 4):
+            sleep(5)
+            q = urllib.parse.urlencode({"keywords": term, "page": page, "sortBy": "relevance", "descending": "false", "internal": "false"})
+            js = (get(f"https://{host}/api/jobs?{q}") or {}).get("jobs") or []
+            for x in js:
+                d = x.get("data") or {}
+                t, rid = d.get("title", ""), d.get("req_id") or d.get("slug")
+                if rid in seen or not TITLE.search(t) or EXCL.search(t): continue
+                if (d.get("country_code") or "").upper() not in ("US", "USA") and "united states" not in (d.get("full_location") or "").lower(): continue
+                seen.add(rid)
+                out.append(dict(company=name, title=t, loc=(d.get("full_location") or d.get("location_name") or "") + ", United States",
+                                url=d.get("apply_url") or f"https://{host}/careers-home/jobs/{rid}", updated=(d.get("posted_date") or d.get("create_date") or "")[:10],
+                                desc=(d.get("description") or "") + " " + (d.get("qualifications") or "") + " " + (d.get("responsibilities") or ""),
+                                comp="", remote=bool(re.search(r"remote", (d.get("location_type") or "") + (d.get("full_location") or ""), re.I)), src="big"))
+            if len(js) < 10: break
+    return out
+
+# Career sites on Radancy: their robots.txt block the search pages but allow the sitemap and job pages,
+# so list jobs from the sitemap and read each job page's structured JobPosting data.
+RADANCY = [("Charles Schwab", "https://www.schwabjobs.com/sitemap.xml"), ("UnitedHealth Group", "https://careers.unitedhealthgroup.com/sitemap.xml"),
+           ("Comcast", "https://jobs.comcast.com/sitemap.xml"), ("Intuit", "https://jobs.intuit.com/sitemap.xml"),
+           ("Palo Alto Networks", "https://jobs.paloaltonetworks.com/en/sitemap.xml")]
+SLUG = re.compile(r"/job/[^/]+/[^/]*(?:data|analytic|software|backend|back-end|etl|platform|intelligence)[^/]*/", re.I)
+NONUS_SLUG = re.compile(r"/job/(?:bangalore|bengaluru|hyderabad|chennai|pune|noida|gurgaon|gurugram|mumbai|dublin|london|toronto|manila|makati|krakow|warsaw|singapore|sydney|tel-aviv|prague|costa-rica|heredia|mexico|guadalajara)", re.I)
+
+def radancy(entry):
+    name, sm = entry
+    try:
+        xml = urllib.request.urlopen(urllib.request.Request(sm, headers=UA), timeout=40).read().decode("utf-8", "replace")
+    except Exception:
+        return []
+    urls = [u for u in re.findall(r"<loc>([^<]+)</loc>", xml) if SLUG.search(u) and not NONUS_SLUG.search(u)]
+    out = []
+    for u in urls[:90]:
+        __import__("time").sleep(1)
+        try:
+            page = urllib.request.urlopen(urllib.request.Request(u, headers=UA), timeout=25).read().decode("utf-8", "replace")
+        except Exception:
+            continue
+        for blob in re.findall(r'<script[^>]*application/ld\+json[^>]*>(.*?)</script>', page, re.S):
+            try: d = json.loads(blob)
+            except Exception: continue
+            if not (isinstance(d, dict) and d.get("@type") == "JobPosting"): continue
+            t = html.unescape(d.get("title", ""))
+            places = d.get("jobLocation") or []
+            places = places if isinstance(places, list) else [places]
+            addr = [p.get("address") or {} for p in places if isinstance(p, dict)]
+            if not any((a.get("addressCountry") or "").upper() in ("US", "USA", "UNITED STATES") for a in addr): break
+            if not TITLE.search(t) or EXCL.search(t): break
+            loc = "; ".join(", ".join(filter(None, (a.get("addressLocality"), a.get("addressRegion")))) for a in addr) + ", United States"
+            out.append(dict(company=name, title=t, loc=loc, url=d.get("url") or u, updated=(d.get("datePosted") or "")[:10],
+                            desc=html.unescape(d.get("description") or ""), comp="", remote=bool(re.search(r"remote", t + " " + loc, re.I)), src="big"))
+            break
+    return out
+
+def toyota():
+    out, seen = [], set()
+    hdr = {**UA, "Content-Type": "application/json"}
+    for term in BIG_TERMS:
+        for start in range(0, 100, 50):
+            body = {"lang": "en_us", "deviceType": "desktop", "country": "us", "pageName": "search-results", "ddoKey": "refineSearch", "sortBy": "", "subsearch": "",
+                    "from": start, "jobs": True, "counts": True, "all_fields": ["category", "country", "state", "city"], "size": 50, "clearAll": False,
+                    "jdsource": "facets", "isSliderEnable": False, "pageId": "page20", "siteType": "external", "keywords": term, "global": True, "selected_fields": {}, "locationData": {}}
+            try:
+                d = json.load(urllib.request.urlopen(urllib.request.Request("https://careers.toyota.com/widgets", data=json.dumps(body).encode(), headers=hdr), timeout=25))
+            except Exception:
+                break
+            js = ((d.get("refineSearch") or {}).get("data") or {}).get("jobs") or []
+            for x in js:
+                t = x.get("title", "")
+                if x.get("jobId") in seen or "United States" not in (x.get("country") or "") or not TITLE.search(t) or EXCL.search(t): continue
+                seen.add(x.get("jobId"))
+                out.append(dict(company="Toyota", title=t, loc=(x.get("cityState") or x.get("city") or "") + ", United States",
+                                url=x.get("applyUrl") or f"https://careers.toyota.com/us/en/job/{x.get('jobId')}", updated=(x.get("postedDate") or "")[:10],
+                                desc=(x.get("descriptionTeaser") or "") + " " + " ".join(x.get("ml_skills") or []), comp="", remote=False, src="big"))
+            if len(js) < 50: break
+    return out
+
 def ash(c):
     d = get(f"https://api.ashbyhq.com/posting-api/job-board/{c}?includeCompensation=true")
     out = []
@@ -587,7 +676,9 @@ def main():
     # Aggregator listings often repeat a company-board posting; keep the company-board copy.
     nk = lambda c, t: re.sub(r"[^a-z0-9]", "", (c + "|" + t).lower())
     direct = {nk(NAMES.get(j["company"], j["company"]), j["title"]) for j in raw}
-    for f in (amazon, microsoft, google, apple, netflix, meta, atlassian, tiktok, ibm) + tuple((lambda e=e: oracle_hcm(e)) for e in ORA):
+    with cf.ThreadPoolExecutor(9) as ex:  # slow sites with crawl delays, in parallel
+        raw += [x for lst in ex.map(jibe, JIBE) for x in lst] + [x for lst in ex.map(radancy, RADANCY) for x in lst]
+    for f in (amazon, microsoft, google, apple, netflix, meta, atlassian, tiktok, ibm) + tuple((lambda e=e: oracle_hcm(e)) for e in ORA) + (toyota,):
         try: raw += f()
         except Exception as e: print(f.__name__, "failed:", e)
     for j in jooble():
