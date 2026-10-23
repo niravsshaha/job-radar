@@ -83,9 +83,10 @@
     timer = null;
     if (busy){ again = true; return; }
     busy = true; show("Syncing…");
-    var L = localMap();
     pull().then(function(R){
-      var M = merge(L, R.entries); apply(M);
+      // Read this browser's changes only after the download finishes, so a job marked applied
+      // while the request was in flight isn't overwritten by the older copy.
+      var M = merge(localMap(), R.entries); apply(M);
       if (!tok()) return "ro";
       if (J(M) === J(R.entries)) return "ok";
       return push(M, R.sha).then(function(){ return "ok"; });

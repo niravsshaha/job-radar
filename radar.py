@@ -7,9 +7,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 P = lambda f: os.path.join(HERE, f)
 
 # Companies to search. Greenhouse board slugs and Ashby board slugs.
-GH = """6sense abacus abnormalsecurity adyen affirm airbnb airship airtable akunacapital algolia alloy alpaca alphasights anaplan anthropic appian applovin apptronik asana attentive aura axios axon axonius backblaze betterment billcom bitgo bitwarden blend blinkhealth block blockchain bloomreach boxinc branch brave braze brex bugcrowd buildkite buildops builtin calendly calm cameo careem carta carvana chainguard checkr chime circleci clear clever cloudflare coalition cockroachlabs cognite coinbase collibra consensys contentful coreweave coupang coursera current dashlane databento databricks datadog dataiku deliveroo descript devrev dialpad discord doordashusa doximity dremio dropbox druva duolingo earnest earnin elastic epicgames epirus esri everlane everlaw expel extend faire fanduel fastly federato fetch fieldwire figma fireblocks fivetran flatironhealth fleetio flexport flowcode formlabs forter freenome fubotv gemini gitlab gocardless gofundme grafanalabs gravity greenhouse gusto hellofresh honeycomb honor hover hudl huntress imc imply instacart instawork insurify intercom invisible janestreet jfrog jumptrading justworks kaseya khanacademy kickstarter klaviyo knowbe4 komodohealth labelbox lattice launchdarkly liftoff lightmatter lithic logicgate lucidmotors lyft masterclass mavenclinic medium melio mercury mindbody mirakl mixpanel modernhealth moloco mongodb monzo mozilla nayya neo4j netlify netskope neuralink newrelic newsela nextdoor nextroll nooks nuro offerup okta onemedical oscar oura pagerduty peloton pendo pinterest planetlabs planetscale prenuvo prizepicks purestorage qualia qualtrics quince reddit redwoodmaterials relativity riotgames ripple robinhood roblox rocketlab roku rubrik salesloft samsara scaleai scopely seatgeek sendbird sigmacomputing simplisafe singlestore smartrent smartsheet snorkelai sofi splice squarespace stabilityai stackadapt stackblitz starburst stitchfix stripe sumologic sumup sweetgreen tailscale tanium taskrabbit taxbit tebra tide toast tripactions tripadvisor truebill twilio twitch udacity udemy underdog upgrade upstart vercel verkada via waymo webflow wikimedia wonderschool workato wrike xometry yext yotpo yugabyte zocdoc zscaler zuora""".split()
-ASH = """1password abridge acorns airbyte airwallex alchemy amplitude andela anyscale appfolio applied aptible ashby astronomer attio benchling benevity brightwheel brigit bubble buildops cambly cerebras character circle citizen classdojo clearco clickhouse clickup close clubhouse cognition cohere collective commure conductor confluent crusoe cursor dandy decagon deepgram delinea dispatch docker drata dune eightsleep elevenlabs envoy expensify extend flock glide graphite hackerone handshake harvey headway hex hightouch hopper incident indigo influxdata insitro iterable jobber kayak kin lemonade level linear mapbox materialize maven mercor merge modal montecarlodata motherduck multiverse mural mutiny mux neon nerdwallet nooks notion nubank numeric nuna nylas onebrief openai orb orca outschool overjet owner parafin patreon paxos perplexity persona photoroom pinecone plaid playground poshmark posthog prefect primer qumulo quora radiant railway ramp recharge redis render replit resend rho rula runway sardine secureframe semgrep sentilink sentry shift sierra sift skydio slope snapdocs snowflake snyk sonder sprig strava substack suno supabase synthesia tabs tekion temporal tennr thumbtack titan tracksuit unit upside vanta vise vivid warp watershed wealthsimple weave whoop writer xero zapier zip""".split()
-LEV = """activecampaign aircall anchorage angellist arcadia basis binance captivateiq emburse everbridge goodleap gopuff houzz jumpcloud linkedin metabase olo outreach palantir peerspace pipedrive ro rover spotify tala toptal veeva voltus wealthfront zeta zoox""".split()
+GH = """6sense abacus abnormalsecurity adyen affirm airbnb airship airtable akunacapital algolia alloy alpaca alphasights anaplan anthropic appian applovin apptronik asana attentive aura axios axon axonius backblaze betterment billcom bitgo bitwarden blend blinkhealth block blockchain bloomreach boxinc branch brave braze brex bugcrowd buildkite buildops builtin calendly calm cameo careem carta carvana chainguard checkr chime circleci clear clever cloudflare coalition cockroachlabs cognite coinbase collibra consensys contentful coreweave coupang coursera current dashlane databento databricks datadog dataiku deliveroo descript devrev dialpad discord doordashusa doximity dremio dropbox druva duolingo earnest earnin elastic epicgames epirus esri everlane everlaw expel extend faire fanduel fastly federato fetch fieldwire figma fireblocks fivetran flatironhealth fleetio flexport flowcode formlabs forter freenome fubotv gemini gitlab gocardless gofundme grafanalabs gravity greenhouse gusto hellofresh honeycomb honor hootsuite hover hudl huntress imc imply instacart instawork insurify intercom invisible janestreet jfrog jumptrading justworks kaseya khanacademy kickstarter klaviyo knowbe4 komodohealth labelbox lattice launchdarkly liftoff lightmatter lithic logicgate lucidmotors lyft masterclass mavenclinic medium melio mercury mindbody mirakl mixpanel modernhealth moloco mongodb monzo mozilla nayya neo4j netlify netskope neuralink newrelic newsela nextdoor nextroll nooks nuro offerup okta onemedical oscar oura pagerduty peloton pendo pinterest planetlabs planetscale prenuvo prizepicks purestorage qualia qualtrics quince reddit redwoodmaterials relativity riotgames ripple robinhood roblox rocketlab roku rubrik salesloft samsara scaleai scopely seatgeek sendbird sigmacomputing simplisafe singlestore smartrent smartsheet snorkelai sofi splice sproutsocial squarespace stabilityai stackadapt stackblitz starburst stitchfix stripe sumologic sumup sweetgreen tailscale tanium taskrabbit taxbit tebra tide toast tripactions tripadvisor truebill twilio twitch udacity udemy underdog upgrade upstart vercel verkada via waymo webflow wikimedia wonderschool workato wrike xometry yext yotpo yugabyte zocdoc zoominfo zscaler zuora""".split()
+ASH = """1password abridge acorns airbyte airwallex alchemy amplitude andela anyscale appfolio applied aptible ashby astronomer attio benchling benevity brightwheel brigit bubble buildops cambly cerebras character circle citizen classdojo clearco clickhouse clickup close clubhouse cognition cohere collective commure conductor confluent crusoe cursor dandy decagon deepgram delinea dispatch docebo docker drata dune eightsleep elevenlabs envoy expensify extend flock glide graphite hackerone handshake harvey headway hex hightouch hopper illumio incident indigo influxdata insitro iterable jobber kayak kin lemonade level linear mapbox materialize maven mercor merge midjourney modal montecarlodata motherduck multiverse mural mutiny mux neon nerdwallet nooks notion nubank numeric nuna nylas onebrief openai orb orca outschool overjet owner oyster parafin patreon paxos perplexity persona photoroom pinecone plaid playground poshmark posthog prefect primer qumulo quora radiant railway ramp recharge redis render replit resend rho rula runway sardine secureframe semgrep sentilink sentry shift sierra sift skydio slope snapdocs snowflake snyk sonder sprig strava substack suno supabase surveymonkey synthesia tabs tekion temporal tennr thumbtack titan tracksuit unit upside vanta vise vivid warp watershed wealthsimple weave whoop writer xero zapier zip""".split()
+LEV = """activecampaign aircall anchorage angellist arcadia basis bazaarvoice binance captivateiq coupa emburse everbridge goodleap gopuff houzz jumpcloud linkedin metabase olo outreach palantir peerspace pipedrive ro rover sonatype spotify tala toptal veeva voltus wealthfront zeta zoox""".split()
 # Workday career sites: name|tenant|wd number|site (checked only in the daily build; Workday blocks browser requests)
 WD = [l.split("|") for l in """Salesforce|salesforce|12|External_Career_Site
 Nvidia|nvidia|5|NVIDIAExternalCareerSite
@@ -113,7 +113,23 @@ Fiserv|fiserv|5|EXT
 FIS|fis|5|SearchJobs
 Global Payments|tsys|1|TSYS
 Equinix|equinix|1|External
-UPS|hcmportal|5|Search""".splitlines()]
+UPS|hcmportal|5|Search
+Cohesity|cohesity|5|Cohesity_Careers
+Sprinklr|sprinklr|1|careers
+ServiceTitan|servicetitan|1|ServiceTitan
+Zoom|zoom|5|Zoom
+Synchrony|synchronyfinancial|5|careers
+Ameriprise|ameriprise|5|Ameriprise
+Vanguard|vanguard|5|vanguard_external
+Raymond James|raymondjames|1|RaymondJamesCareers
+Hartford|thehartford|5|Careers_External
+Stryker|stryker|1|StrykerCareers
+Thermo Fisher|thermofisher|5|ThermoFisherCareers
+Danaher|danaher|1|DanaherJobs
+Novartis|novartis|3|Novartis_Careers
+GSK|gsk|5|GSKCareers
+AstraZeneca|astrazeneca|3|Careers
+Sanofi|sanofi|3|SanofiCareers""".splitlines()]
 SR = """ServiceNow BoschGroup Canva Experian WesternDigital Freshworks AbbVie""".split()  # SmartRecruiters company ids
 WD_TERMS = ["data engineer", "software engineer", "analytics engineer", "data platform"]
 
@@ -332,6 +348,136 @@ def apple():
             if len(rs) < 20: break
     return out
 
+# Oracle Recruiting Cloud sites: name | host | site number
+ORA = [("JPMorgan Chase", "jpmc.fa.oraclecloud.com", "CX_1001"), ("Oracle", "eeho.fa.us2.oraclecloud.com", "CX_45001")]
+
+def oracle_hcm(entry):
+    name, host, site = entry
+    api, out, reqs = f"https://{host}/hcmRestApi/resources/latest", [], {}
+    for term in BIG_TERMS:
+        for off in range(0, 200, 50):
+            q = f"onlyData=true&expand=requisitionList&finder=findReqs;siteNumber={site},keyword={urllib.parse.quote(term)},limit=50,offset={off}"
+            items = (get(f"{api}/recruitingCEJobRequisitions?{q}") or {}).get("items") or [{}]
+            rl = items[0].get("requisitionList") or []
+            for r in rl:
+                t = r.get("Title", "")
+                if r.get("PrimaryLocationCountry") == "US" and TITLE.search(t) and not EXCL.search(t): reqs.setdefault(r["Id"], r)
+            if len(rl) < 50: break
+    for rid, r in list(reqs.items())[:120]:
+        q = f'expand=all&onlyData=true&finder=ById;Id=%22{rid}%22,siteNumber={site}'
+        d = ((get(f"{api}/recruitingCEJobRequisitionDetails?{q}") or {}).get("items") or [{}])[0]
+        out.append(dict(company=name, title=r.get("Title", ""), loc=r.get("PrimaryLocation", "") or "United States",
+                        url=f"https://{host}/hcmUI/CandidateExperience/en/sites/{site}/job/{rid}", updated=r.get("PostedDate", ""),
+                        desc=" ".join(d.get(k) or "" for k in ("ExternalDescriptionStr", "ExternalResponsibilitiesStr", "ExternalQualificationsStr")) or r.get("ShortDescriptionStr", ""),
+                        comp="", remote=bool(re.search(r"remote", r.get("WorkplaceType") or "", re.I)), src="big"))
+    return out
+
+def atlassian():
+    out = []
+    for r in get("https://www.atlassian.com/endpoint/careers/listings") or []:
+        t, locs = r.get("title", ""), [l for l in (r.get("locations") or []) if re.search(r"united states|\bUSA\b", l, re.I)]
+        if not locs or not TITLE.search(t) or EXCL.search(t): continue
+        out.append(dict(company="Atlassian", title=t, loc="; ".join(locs), url=r.get("applyUrl", ""), updated=((r.get("portalJobPost") or {}).get("updatedDate") or "")[:10],
+                        desc=" ".join(r.get(k) or "" for k in ("overview", "responsibilities", "qualifications")), comp="", remote=any("remote" in l.lower() for l in locs), src="big"))
+    return out
+
+def tiktok():
+    out, seen = [], set()
+    hdr = {**UA, "Content-Type": "application/json", "website-path": "tiktok"}
+    for term in BIG_TERMS:
+        for off in range(0, 300, 100):
+            body = {"recruitment_id_list": [], "job_category_id_list": [], "subject_id_list": [], "location_code_list": [], "keyword": term, "limit": 100, "offset": off}
+            try:
+                d = json.load(urllib.request.urlopen(urllib.request.Request("https://api.lifeattiktok.com/api/v1/public/supplier/search/job/posts", data=json.dumps(body).encode(), headers=hdr), timeout=25))
+            except Exception:
+                break
+            js = ((d or {}).get("data") or {}).get("job_post_list") or []
+            for x in js:
+                t, c, chain = x.get("title", ""), x.get("city_info") or {}, []
+                n = c
+                while n: chain.append(n.get("en_name") or ""); n = n.get("parent")
+                if x.get("id") in seen or "United States of America" not in chain or not TITLE.search(t) or EXCL.search(t): continue
+                seen.add(x.get("id"))
+                out.append(dict(company="TikTok", title=t, loc=", ".join(chain[:2]) + ", United States", url=f"https://lifeattiktok.com/search/{x.get('id')}",
+                                updated="", desc=(x.get("description") or "") + " " + (x.get("requirement") or ""), comp="", remote=False, src="big"))
+            if len(js) < 100: break
+    return out
+
+def ibm():
+    out, seen = [], set()
+    for term in BIG_TERMS:
+        body = {"appId": "careers", "scopes": ["careers2"], "query": {"bool": {"must": [{"simple_query_string": {"query": term, "fields": ["title^3", "description^2"]}}],
+                "filter": [{"term": {"field_keyword_05": "United States"}}]}}, "size": 100, "lang": "zz", "localeSelector": {}, "sm": {"query": term, "lang": "zz"},
+                "_source": ["title", "url", "description", "field_keyword_05", "field_keyword_19"]}
+        d = post("https://www-api.ibm.com/search/api/v2", body) or {}
+        for h in (d.get("hits") or {}).get("hits") or []:
+            x = h.get("_source") or {}; t = x.get("title", "")
+            if x.get("url") in seen or x.get("field_keyword_05") != "United States" or not TITLE.search(t) or EXCL.search(t): continue
+            seen.add(x.get("url"))
+            loc = x.get("field_keyword_19") or ""
+            out.append(dict(company="IBM", title=t, loc=(loc.replace(", US", ", United States") if loc and loc != "Multiple Cities" else "Multiple Cities, United States"),
+                            url=x.get("url", ""), updated="", desc=x.get("description", ""), comp="", remote=False, src="big"))
+    return out
+
+def netflix():
+    base, out, ids = "https://explore.jobs.netflix.net/api/apply/v2/jobs", [], {}
+    for term in BIG_TERMS:
+        for start in range(0, 100, 10):
+            q = urllib.parse.urlencode({"domain": "netflix.com", "query": term, "location": "United States", "start": start})
+            ps = (retry(get, f"{base}?{q}") or {}).get("positions") or []
+            __import__("time").sleep(0.3)  # Netflix throttles fast clients
+            for p in ps:
+                t = p.get("name", "")
+                if TITLE.search(t) and not EXCL.search(t) and "United States" in (p.get("location") or ""): ids.setdefault(p["id"], p)
+            if len(ps) < 10: break
+    for pid, p in list(ids.items())[:80]:
+        __import__("time").sleep(0.3)
+        d = retry(get, f"{base}/{pid}?domain=netflix.com") or {}
+        out.append(dict(company="Netflix", title=p.get("name", ""), loc="; ".join(p.get("locations") or [p.get("location", "")]),
+                        url=p.get("canonicalPositionUrl") or f"https://explore.jobs.netflix.net/careers/job/{pid}",
+                        updated=datetime.datetime.fromtimestamp(int(p.get("t_update") or 0), datetime.timezone.utc).strftime("%Y-%m-%d") if p.get("t_update") else "",
+                        desc=d.get("job_description") or "", comp="", remote="remote" in (p.get("location") or "").lower(), src="big"))
+    return out
+
+def meta():
+    """Meta's career site has no public feed, so read its search pages with a headless browser (allowed by its robots.txt)."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return []
+    out, links = [], {}
+    with sync_playwright() as pw:
+        b = pw.chromium.launch()
+        pg = b.new_context(user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36").new_page()
+        for term in ["Data Engineer", "Software Engineer", "Analytics Engineer", "Data Infrastructure"]:
+            for page in range(1, 9):
+                try:
+                    pg.goto("https://www.metacareers.com/jobsearch/?" + urllib.parse.urlencode({"q": term, "offices[0]": "North America", "page": page}), wait_until="networkidle", timeout=45000)
+                    got = pg.eval_on_selector_all('a[href*="/job_details/"]', "as => as.map(a => [a.href, a.innerText])")
+                except Exception:
+                    break
+                new = 0
+                for h, txt in got:
+                    h = h.split("?")[0]
+                    if h in links: continue
+                    links[h] = txt; new += 1
+                if not new: break
+        keep = []
+        for h, txt in links.items():
+            lines = [l.strip() for l in txt.split("\n") if l.strip() and l.strip() != "\u22c5"]
+            t = lines[0] if lines else ""
+            locs = [l for l in lines[1:] if USSTATE.search(l) or re.search(r"remote, us|united states", l, re.I)]
+            if t and locs and TITLE.search(t) and not EXCL.search(t) and not SKIP_TITLE.search(t): keep.append((h, t, locs))
+        for h, t, locs in keep[:80]:
+            try:
+                pg.goto(h, wait_until="networkidle", timeout=45000); body = pg.inner_text("body")
+            except Exception:
+                body = ""
+            out.append(dict(company="Meta", title=t, loc="; ".join(locs), url=h, updated="", desc=body, comp="",
+                            remote=any("remote" in l.lower() for l in locs), src="big"))
+        b.close()
+    return out
+
 def ash(c):
     d = get(f"https://api.ashbyhq.com/posting-api/job-board/{c}?includeCompensation=true")
     out = []
@@ -374,6 +520,32 @@ def years_req(d):
     return max(v) if v else None
 SAL = re.compile('\\$\\s?(\\d{2,3}(?:,\\d{3})+|\\d{2,3}k)\\s*(?:-|–|—|to)\\s*\\$?\\s?(\\d{2,3}(?:,\\d{3})+|\\d{2,3}k)', re.I)
 
+# Roles you can't take: they need a US security clearance, or they won't sponsor a work visa.
+CLEARANCE = re.compile(r"security clearance|secret clearance|top secret|\bts\s*/\s*sci\b|\bsci\b eligib|active clearance|clearance (?:is )?required|"
+                       r"(?:obtain|hold|maintain|possess)(?: and maintain)? (?:a |an )?(?:active |current )?(?:us |u\.s\. )?(?:government |dod |federal )?"
+                       r"(?:security )?clearance|public trust|polygraph|dod secret|clearance eligib|(?:possess|obtain)\s*:\s*(?:secret|top secret|ts\b)", re.I)
+NO_SPONSOR = re.compile(r"(?:unable|not able|cannot|can ?not|can't|will not|won't|do not|does not|don't|doesn't|not)(?: be)?(?: able)? to (?:currently )?"
+                        r"(?:provide|offer|support|consider)? ?(?:any )?(?:visa |immigration |employment |h-?1b )?sponsor|"
+                        r"(?:will not|won't|do not|does not|don't|doesn't|cannot|can't|unable to|not) (?:currently )?(?:provide |offer )?(?:visa |immigration |employment |h-?1b )?sponsor|"
+                        r"without (?:the )?(?:need for |requiring |requirement of )?(?:current or future |now or in the future |future )?(?:visa |immigration |employment |employer )?sponsorship|"
+                        r"no (?:visa |immigration |h-?1b )?sponsorship|sponsorship (?:is |will )?not (?:be )?(?:available|provided|offered|considered)|"
+                        r"not (?:eligible|available) for (?:visa |immigration )?sponsorship|"
+                        r"must be (?:a )?(?:u\.?s\.? |us |united states )citizen|(?:u\.?s\.?|us|united states) citizenship (?:is )?required|requires? (?:u\.?s\.?|us) citizenship|"
+                        r"green card holders? only|citizens? (?:or green card holders? )?only", re.I)
+NEGATED = re.compile(r"(?:\bno\b|\bnot\b|n't|without)[^.;]{0,25}$", re.I)
+
+def blocked(title, d):
+    """Return 'clearance' / 'sponsorship' when a posting rules you out, else ''."""
+    text = title + " " + d
+    for kind, rx in (("clearance", CLEARANCE), ("sponsorship", NO_SPONSOR)):
+        for m in rx.finditer(text):
+            before, after = text[max(0, m.start() - 40):m.start()], text[m.end():m.end() + 40]
+            if kind == "clearance" and NEGATED.search(before): continue           # "no security clearance required"
+            if re.match(r"[\s:/\w-]{0,25}?\b(?:none|not required|n/a)\b", after, re.I): continue  # "Clearance ... Required: None"
+            if re.match(r"\s*(?:protection act|for an export|for export)", after, re.I): continue   # legal boilerplate
+            return kind
+    return ""
+
 def score(j):
     loc = j.get('loc') or ''
     d = strip(j.get('desc', ''))
@@ -382,6 +554,7 @@ def score(j):
     for m in RESIDE.finditer(d[:4000]):  # e.g. 'open to candidates residing in Canada'
         if NONUS.search(m.group(1)) and not USPLACE.search(m.group(1)): return None
     if SKIP_TITLE.search(j['title']): return None
+    if blocked(j['title'], d): return None
     text = j['title'] + ' ' + d
     match, gap, tot, got = [], [], 0, 0
     for k, (rx, w, h) in SK.items():
@@ -414,7 +587,7 @@ def main():
     # Aggregator listings often repeat a company-board posting; keep the company-board copy.
     nk = lambda c, t: re.sub(r"[^a-z0-9]", "", (c + "|" + t).lower())
     direct = {nk(NAMES.get(j["company"], j["company"]), j["title"]) for j in raw}
-    for f in (amazon, microsoft, google, apple):
+    for f in (amazon, microsoft, google, apple, netflix, meta, atlassian, tiktok, ibm) + tuple((lambda e=e: oracle_hcm(e)) for e in ORA):
         try: raw += f()
         except Exception as e: print(f.__name__, "failed:", e)
     for j in jooble():

@@ -49,6 +49,24 @@
         desc: (j.descriptionPlain || "") + " " + (j.additionalPlain || ""), comp: comp, remote: j.workplaceType === "remote"};
     }); }); }
 
+  // Skip roles that need a US security clearance or won't sponsor a visa (same rules as radar.py).
+  var CLEARANCE = new RegExp("security clearance|secret clearance|top secret|\\bts\\s*/\\s*sci\\b|\\bsci\\b eligib|active clearance|clearance (?:is )?required|(?:obtain|hold|maintain|possess)(?: and maintain)? (?:a |an )?(?:active |current )?(?:us |u\\.s\\. )?(?:government |dod |federal )?(?:security )?clearance|public trust|polygraph|dod secret|clearance eligib|(?:possess|obtain)\\s*:\\s*(?:secret|top secret|ts\\b)", "gi"), NO_SPONSOR = new RegExp("(?:unable|not able|cannot|can ?not|can't|will not|won't|do not|does not|don't|doesn't|not)(?: be)?(?: able)? to (?:currently )?(?:provide|offer|support|consider)? ?(?:any )?(?:visa |immigration |employment |h-?1b )?sponsor|(?:will not|won't|do not|does not|don't|doesn't|cannot|can't|unable to|not) (?:currently )?(?:provide |offer )?(?:visa |immigration |employment |h-?1b )?sponsor|without (?:the )?(?:need for |requiring |requirement of )?(?:current or future |now or in the future |future )?(?:visa |immigration |employment |employer )?sponsorship|no (?:visa |immigration |h-?1b )?sponsorship|sponsorship (?:is |will )?not (?:be )?(?:available|provided|offered|considered)|not (?:eligible|available) for (?:visa |immigration )?sponsorship|must be (?:a )?(?:u\\.?s\\.? |us |united states )citizen|(?:u\\.?s\\.?|us|united states) citizenship (?:is )?required|requires? (?:u\\.?s\\.?|us) citizenship|green card holders? only|citizens? (?:or green card holders? )?only", "gi"), NEGATED = new RegExp("(?:\\bno\\b|\\bnot\\b|n't|without)[^.;]{0,25}$", "i");
+  function blocked(title, d){
+    var text = title + " " + d, kinds = [["clearance", CLEARANCE], ["sponsorship", NO_SPONSOR]];
+    for (var k = 0; k < kinds.length; k++){
+      var rx = kinds[k][1], m; rx.lastIndex = 0;
+      while ((m = rx.exec(text))){
+        var before = text.slice(Math.max(0, m.index - 40), m.index), after = text.slice(m.index + m[0].length, m.index + m[0].length + 40);
+        if (!m[0].length) { rx.lastIndex++; continue; }
+        if (kinds[k][0] === "clearance" && NEGATED.test(before)) continue;
+        if (/^[\s:\/\w-]{0,25}?\b(?:none|not required|n\/a)\b/i.test(after)) continue;
+        if (/^\s*(?:protection act|for an export|for export)/i.test(after)) continue;
+        return kinds[k][0];
+      }
+    }
+    return "";
+  }
+
   function score(j){
     var loc = j.loc || "", d = strip(j.desc);
     if (NONUS.test(loc) && !USPLACE.test(loc)) return null;
@@ -57,6 +75,7 @@
     RESIDE.lastIndex = 0;
     while ((m = RESIDE.exec(head))) { if (NONUS.test(m[1]) && !USPLACE.test(m[1])) return null; }
     if (SKIP_TITLE.test(j.title)) return null;
+    if (blocked(j.title, d)) return null;
     var text = j.title + " " + d, match = [], gap = [], tot = 0, got = 0;
     SK.forEach(function(s){ if (s[1].test(text)) { tot += s[2]; got += s[2] * s[3]; (s[3] >= 0.5 ? match : gap).push(s[0]); } });
     if (!tot) return null;
