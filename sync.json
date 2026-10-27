@@ -1,13 +1,9 @@
 {
- "updated": "2026-10-23T18:21:00.549Z",
+ "updated": "2026-10-27T18:02:24.886Z",
  "entries": {
   "a|https://boards.greenhouse.io/figma/jobs/5551686004?gh_jid=5551686004": {
    "v": true,
    "t": 1792455367428
-  },
-  "a|https://job-boards.greenhouse.io/doordashusa/jobs/6458514": {
-   "v": "2026-10-08T21:23:00-05:00",
-   "t": 1792289948565
   },
   "a|https://boards.greenhouse.io/cloudflare/jobs/8055118?gh_jid=8055118": {
    "v": "2026-10-08T00:00:00-05:00",
@@ -40,6 +36,10 @@
   "a|https://www.samsara.com/company/careers/roles/8141959?gh_jid=8141959": {
    "v": "2026-10-08T00:00:00-05:00",
    "t": 1792455367428
+  },
+  "a|https://job-boards.greenhouse.io/doordashusa/jobs/6458514": {
+   "v": "2026-10-08T21:23:00-05:00",
+   "t": 1792289948565
   },
   "a|https://nuro.ai/careersitem?gh_jid=7786521": {
    "v": "2026-10-09T19:40:52.382Z",
@@ -151,6 +151,28 @@
   },
   "a|https://cvshealth.wd1.myworkdayjobs.com/CVS_Health_Careers/job/TX---Farmers-Branch/Data-Engineer---People-Analytics_R1070400": {
    "v": "2026-10-18T00:36:21.058Z",
+   "t": 1792289948565
+  },
+  "m|1792103598159": {
+   "v": {
+    "mid": "1792103598159",
+    "company": "Google",
+    "title": "Software Engineer, Google Health, Nutrition",
+    "url": "https://www.google.com/about/careers/applications/jobs/results/82369041234043590-software-engineer-google-health-nutrition",
+    "at": "2026-10-15T22:33:18.159Z",
+    "status": "Applied"
+   },
+   "t": 1792289948565
+  },
+  "m|1792101673310": {
+   "v": {
+    "mid": "1792101673310",
+    "company": "Google",
+    "title": "Data Engineer, Merchant Shopping",
+    "url": "https://www.google.com/about/careers/applications/jobs/results/92258849825661638-data-engineer-merchant-shopping",
+    "at": "2026-10-15T22:01:13.310Z",
+    "status": "Applied"
+   },
    "t": 1792289948565
   },
   "a|https://cvshealth.wd1.myworkdayjobs.com/CVS_Health_Careers/job/AZ---Scottsdale/Software-Engineer---Workforce-Insights_R1070099": {
@@ -440,28 +462,6 @@
     "at": "2026-10-23T02:27:17.122Z"
    },
    "t": 1792722438324
-  },
-  "m|1792103598159": {
-   "v": {
-    "mid": "1792103598159",
-    "company": "Google",
-    "title": "Software Engineer, Google Health, Nutrition",
-    "url": "https://www.google.com/about/careers/applications/jobs/results/82369041234043590-software-engineer-google-health-nutrition",
-    "at": "2026-10-15T22:33:18.159Z",
-    "status": "Applied"
-   },
-   "t": 1792289948565
-  },
-  "m|1792101673310": {
-   "v": {
-    "mid": "1792101673310",
-    "company": "Google",
-    "title": "Data Engineer, Merchant Shopping",
-    "url": "https://www.google.com/about/careers/applications/jobs/results/92258849825661638-data-engineer-merchant-shopping",
-    "at": "2026-10-15T22:01:13.310Z",
-    "status": "Applied"
-   },
-   "t": 1792289948565
   },
   "a|https://bah.wd1.myworkdayjobs.com/BAH_Jobs/job/Fort-Belvoir-VA/Data-Engineer_R0251749": {
    "v": null,
