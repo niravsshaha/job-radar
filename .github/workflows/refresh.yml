@@ -28,7 +28,7 @@ jobs:
         run: |
           git config user.name "job-radar-bot"
           git config user.email "job-radar-bot@users.noreply.github.com"
-          git add index.html jobs.json
+          git add index.html jobs.json swe.html jobs_swe.json
           git diff --cached --quiet || git commit -m "Daily job refresh $(date -u +%F)"
           # The page also saves sync.json to this repo, so catch up before pushing.
           for i in 1 2 3 4 5; do git pull --rebase origin main && git push && exit 0; sleep 10; done
