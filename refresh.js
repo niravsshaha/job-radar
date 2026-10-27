@@ -29,14 +29,14 @@
   if (SWE) SK = [
     ["Python", /python/i, 8, 1], ["C/C++", /\bc\+\+|\bc\/c\+\+|\bc or c\+\+|\bc, c\+\+/i, 8, 0.7], ["Java", /\bjava\b/i, 4, 0.5], ["Go", /\bgolang\b|\bgo\b,|\bin go\b|\bgo\)/i, 5, 0],
     ["Distributed systems", /distributed system|high[- ]throughput|large[- ]scale (?:distributed|systems|services)/i, 8, 1], ["Linux", /linux|unix/i, 5, 1], ["REST APIs", /\brest\b|restful|microservice/i, 3, 1],
-    ["System design", /system design|design doc|architect(?:ed|ing)? (?:and|scalable|systems|services)/i, 3, 1], ["SQL", /\bsql\b/i, 4, 1], ["GCP", /\bgcp\b|google cloud/i, 5, 1], ["AWS", /\baws\b|\bec2\b|\bs3\b|lambda/i, 4, 0.3],
+    ["System design", /re-?architect|system design|design doc|architect(?:ed|ing)? (?:and|scalable|systems|services)/i, 3, 1], ["SQL", /\bsql\b/i, 4, 1], ["GCP", /\bgcp\b|google cloud/i, 5, 1], ["AWS", /\baws\b|\bec2\b|\bs3\b|lambda/i, 4, 0.3],
     ["Azure", /azure/i, 2, 0.5], ["Kubernetes/Docker", /kubernetes|\bk8s\b|docker|container/i, 5, 0.8], ["CI/CD", /ci\/cd|jenkins|github actions|continuous (integration|delivery)/i, 4, 0.8],
     ["Terraform/IaC", /terraform|infrastructure as code/i, 2, 0.6], ["Streaming (Kafka/Pub/Sub)", /kafka|pub\/?sub|kinesis|streaming|event[- ]driven/i, 5, 1],
     ["Data processing (Spark/Beam)", /spark|apache beam|dataflow|hadoop/i, 3, 0.8], ["Airflow", /airflow/i, 2, 1], ["BigQuery", /bigquery/i, 3, 1],
     ["Concurrency", /multi-?thread|concurren|parallel/i, 4, 0.8], ["TCP/IP networking", /\btcp\b|\budp\b|socket|ip networking|networking protocol/i, 4, 0.7],
     ["Testing", /unit test|automated test|test automation|integration test|pytest|test infrastructure/i, 4, 0.8], ["Debugging", /debug|troubleshoot|root.cause/i, 4, 1],
     ["Reliability/on-call", /on-?call|\bsla\b|incident response|high availability|site reliability/i, 3, 1], ["Monitoring", /monitoring|observab|alerting|telemetry/i, 3, 1],
-    ["Performance/cost", /performance|latency|scalab/i, 2, 1], ["Caching", /cach/i, 2, 0.8], ["AI agents/LLMs", /\bllm|agentic|ai agent|generative ai|\bgenai\b/i, 3, 0.8],
+    ["Performance/cost", /performance|latency|scalab/i, 2, 1], ["Caching", /cach/i, 2, 0.8], ["AI agents/LLMs", /\bllm|agentic|ai[- ]agent|generative ai|\bgenai\b/i, 3, 0.8],
     ["gRPC", /grpc|protobuf/i, 2, 0], ["Rust", /\brust\b/i, 2, 0], ["JavaScript/TypeScript", /javascript|typescript|react|node\.?js/i, 4, 0.3],
     ["Layer 2/3 protocols", /layer ?2|layer ?3|\bbgp\b|ospf|vlan|vxlan|evpn|lacp|\bstp\b|mpls/i, 4, 0.1], ["Low-level hardware", /\bphys?\b|transceiver|optics|device driver|kernel|\bpcie\b|asic|fpga/i, 4, 0.1]
   ];
@@ -150,7 +150,12 @@
 
   btn.addEventListener("click", function(){
     btn.disabled = true; btn.textContent = "Refreshing…"; msg.textContent = "Loading company list…";
-    fetch("radar.py", {cache: "no-store"}).then(function(r){ return r.text(); }).then(function(src){
+    // Use the uploaded resume (resumes.json) for what you have, same rule as radar.py.
+    fetch("resumes.json", {cache: "no-store"}).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }).then(function(R){
+      var e = R && R[SWE ? "swe" : "de"];
+      if (e && e.body) SK.forEach(function(s){ s[3] = s[1].test(e.body) ? 1 : (s[1].test(e.skills || "") ? 0.6 : 0); });
+      return fetch("radar.py", {cache: "no-store"});
+    }).then(function(r){ return r.text(); }).then(function(src){
       var L = lists(src);
       var tasks = L.GH.map(function(c){ return function(){ return gh(c); }; })
         .concat(L.ASH.map(function(c){ return function(){ return ash(c); }; }))

@@ -610,14 +610,14 @@ SK = {
 SK_SWE = {
     'Python': (r'python', 8, 1), 'C/C++': (r'\bc\+\+|\bc/c\+\+|\bc or c\+\+|\bc, c\+\+', 8, 0.7), 'Java': (r'\bjava\b', 4, 0.5), 'Go': (r'\bgolang\b|\bgo\b,|\bin go\b|\bgo\)', 5, 0),
     'Distributed systems': (r'distributed system|high[- ]throughput|large[- ]scale (?:distributed|systems|services)', 8, 1), 'Linux': (r'linux|unix', 5, 1), 'REST APIs': (r'\brest\b|restful|microservice', 3, 1),
-    'System design': (r'system design|design doc|architect(?:ed|ing)? (?:and|scalable|systems|services)', 3, 1), 'SQL': (r'\bsql\b', 4, 1), 'GCP': (r'\bgcp\b|google cloud', 5, 1), 'AWS': (r'\baws\b|\bec2\b|\bs3\b|lambda', 4, 0.3),
+    'System design': (r're-?architect|system design|design doc|architect(?:ed|ing)? (?:and|scalable|systems|services)', 3, 1), 'SQL': (r'\bsql\b', 4, 1), 'GCP': (r'\bgcp\b|google cloud', 5, 1), 'AWS': (r'\baws\b|\bec2\b|\bs3\b|lambda', 4, 0.3),
     'Azure': (r'azure', 2, 0.5), 'Kubernetes/Docker': (r'kubernetes|\bk8s\b|docker|container', 5, 0.8), 'CI/CD': (r'ci/cd|jenkins|github actions|continuous (integration|delivery)', 4, 0.8),
     'Terraform/IaC': (r'terraform|infrastructure as code', 2, 0.6), 'Streaming (Kafka/Pub/Sub)': (r'kafka|pub/?sub|kinesis|streaming|event[- ]driven', 5, 1),
     'Data processing (Spark/Beam)': (r'spark|apache beam|dataflow|hadoop', 3, 0.8), 'Airflow': (r'airflow', 2, 1), 'BigQuery': (r'bigquery', 3, 1),
     'Concurrency': (r'multi-?thread|concurren|parallel', 4, 0.8), 'TCP/IP networking': (r'\btcp\b|\budp\b|socket|ip networking|networking protocol', 4, 0.7),
     'Testing': (r'unit test|automated test|test automation|integration test|pytest|test infrastructure', 4, 0.8), 'Debugging': (r'debug|troubleshoot|root.cause', 4, 1),
     'Reliability/on-call': (r'on-?call|\bsla\b|incident response|high availability|site reliability', 3, 1), 'Monitoring': (r'monitoring|observab|alerting|telemetry', 3, 1),
-    'Performance/cost': (r'performance|latency|scalab', 2, 1), 'Caching': (r'cach', 2, 0.8), 'AI agents/LLMs': (r'\bllm|agentic|ai agent|generative ai|\bgenai\b', 3, 0.8),
+    'Performance/cost': (r'performance|latency|scalab', 2, 1), 'Caching': (r'cach', 2, 0.8), 'AI agents/LLMs': (r'\bllm|agentic|ai[- ]agent|generative ai|\bgenai\b', 3, 0.8),
     'gRPC': (r'grpc|protobuf', 2, 0), 'Rust': (r'\brust\b', 2, 0), 'JavaScript/TypeScript': (r'javascript|typescript|react|node\.?js', 4, 0.3),
     'Layer 2/3 protocols': (r'layer ?2|layer ?3|\bbgp\b|ospf|vlan|vxlan|evpn|lacp|\bstp\b|mpls', 4, 0.1), 'Low-level hardware': (r'\bphys?\b|transceiver|optics|device driver|kernel|\bpcie\b|asic|fpga', 4, 0.1),
 }
@@ -630,6 +630,17 @@ PROFILES = {
                 bonus=lambda t, text: 6 if re.search(r'software|backend|back-end|platform|infrastructure|systems|distributed', t, re.I) else 0,
                 blurb="US software, backend, platform and systems engineering roles pulled from company job boards and ranked against your Software Engineer resume: Python, C++, distributed systems, Linux, TCP/IP, Kubernetes and cloud."),
 }
+# If resumes were uploaded from the dashboard ("Resumes" button -> resumes.json), score from them instead of the
+# hand-set values above: a skill used in a bullet or project counts fully, one only under Technical Skills counts 0.6.
+def from_resume(sk, entry):
+    body, skills = entry.get('body', ''), entry.get('skills', '')
+    return {k: (rx, w, 1 if re.search(rx, body, re.I) else 0.6 if re.search(rx, skills, re.I) else 0) for k, (rx, w, h) in sk.items()}
+try:
+    RESUMES = json.load(open(P('resumes.json')))
+    for _k, _p in PROFILES.items():
+        if (RESUMES.get(_k) or {}).get('body'): _p['sk'] = from_resume(_p['sk'], RESUMES[_k])
+except (OSError, ValueError):
+    pass
 strip = lambda s: re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', html.unescape(s or '')))
 # Years of experience a posting asks for: every "5+ years", "3-5 years", "at least 4 years", "5 years of ... experience";
 # the highest one is the real bar (e.g. "7+ years overall, 3+ years with Spark" -> 7).
