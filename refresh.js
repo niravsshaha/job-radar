@@ -1,8 +1,14 @@
 // "Refresh jobs": re-checks every company job board from the browser and rescores the roles.
 (function(){
-  var TITLE = /data|analytics|etl|elt|pipeline|warehouse|lakehouse|business intelligence|\bbi\b|ml platform|ml infra|machine learning (platform|infra)|backend|back-end|software engineer|platform engineer|infrastructure engineer/i;
+  // Two dashboards share this file: index.html (data roles) and swe.html (software roles, window.PROFILE = "swe"). Same rules as radar.py.
+  var SWE = window.PROFILE === "swe";
+  var TITLE_DE = /data|analytics|etl|elt|pipeline|warehouse|lakehouse|business intelligence|\bbi\b|ml platform|ml infra|machine learning (platform|infra)/i;
+  var TITLE_SWE = /software (?:engineer|developer|development engineer)|\bswe\b|\bsde\b|backend|back-end|platform engineer|infrastructure engineer|systems software|distributed systems|site reliability|\bsre\b|developer/i;
+  var DATA_FIRST = /data engineer|analytics engineer|\betl\b|business intelligence|\bbi\b|data analyst|data warehouse|analytics/i;
+  var TITLE = SWE ? TITLE_SWE : TITLE_DE;
   var EXCL = /manager|director|head of|vp|principal|intern|scientist|(?<!data )(?<!intelligence )(?<!bi )(?<!analytics )analyst|sales|account|solutions|customer|support|recruit|counsel|marketing|product manager|designer/i;
-  var SKIP_TITLE = /product management|network|machine learning engineer|research engineer|field engineer|security|hardware|full-stack|frontend/i;
+  var SKIP_TITLE = SWE ? /product management|machine learning engineer|research engineer|field engineer|security|hardware|full[- ]?stack|front[- ]?end|\bios\b|android|mobile|embedded|firmware|flight software|avionics|datacenter|data center|consultant|salesforce|servicenow|\bsap\b|game|graphics/i
+    : /product management|network|machine learning engineer|research engineer|field engineer|security|hardware|full-stack|frontend|embedded|firmware|flight software|avionics|datacenter|data center|consultant/i;
   var USPLACE = /united states|usa|u\.s\.|\bus\b|new york|nyc|san francisco|bay area|seattle|austin|chicago|boston|denver|atlanta|dallas|houston|los angeles|california|texas|mountain view|palo alto|menlo park|sunnyvale|san jose|san mateo|oakland|portland|miami|pittsburgh|philadelphia|salt lake|bellevue|raleigh|minneapolis|nashville|washington, dc|colorado springs|omaha|st\. louis/i;
   var USSTATE = /,\s*(AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY)\b/;
   var RESIDE = /(?:residing|resident|located|based|living|reside|work)\s+(?:in|within|from)\s+(?:the\s+)?([A-Za-z ,]{3,60})/gi;
@@ -20,6 +26,21 @@
     ["Databricks", /databricks|delta lake/i, 4, 0.1], ["Flink", /flink/i, 3, 0], ["AWS", /\baws\b|redshift|s3\b|glue|emr/i, 3, 0.2],
     ["Scala/Java", /\bscala\b|\bjava\b/i, 3, 0.2], ["Go", /\bgolang\b|\bgo\b,/i, 2, 0], ["Terraform", /terraform/i, 2, 0.2], ["Dagster", /dagster/i, 2, 0.3]
   ];
+  if (SWE) SK = [
+    ["Python", /python/i, 8, 1], ["C/C++", /\bc\+\+|\bc\/c\+\+|\bc or c\+\+|\bc, c\+\+/i, 8, 0.7], ["Java", /\bjava\b/i, 4, 0.5], ["Go", /\bgolang\b|\bgo\b,|\bin go\b|\bgo\)/i, 5, 0],
+    ["Distributed systems", /distributed system|high[- ]throughput|large[- ]scale (?:distributed|systems|services)/i, 8, 1], ["Linux", /linux|unix/i, 5, 1], ["REST APIs", /\brest\b|restful|microservice/i, 3, 1],
+    ["System design", /system design|design doc|architect(?:ed|ing)? (?:and|scalable|systems|services)/i, 3, 1], ["SQL", /\bsql\b/i, 4, 1], ["GCP", /\bgcp\b|google cloud/i, 5, 1], ["AWS", /\baws\b|\bec2\b|\bs3\b|lambda/i, 4, 0.3],
+    ["Azure", /azure/i, 2, 0.5], ["Kubernetes/Docker", /kubernetes|\bk8s\b|docker|container/i, 5, 0.8], ["CI/CD", /ci\/cd|jenkins|github actions|continuous (integration|delivery)/i, 4, 0.8],
+    ["Terraform/IaC", /terraform|infrastructure as code/i, 2, 0.6], ["Streaming (Kafka/Pub/Sub)", /kafka|pub\/?sub|kinesis|streaming|event[- ]driven/i, 5, 1],
+    ["Data processing (Spark/Beam)", /spark|apache beam|dataflow|hadoop/i, 3, 0.8], ["Airflow", /airflow/i, 2, 1], ["BigQuery", /bigquery/i, 3, 1],
+    ["Concurrency", /multi-?thread|concurren|parallel/i, 4, 0.8], ["TCP/IP networking", /\btcp\b|\budp\b|socket|ip networking|networking protocol/i, 4, 0.7],
+    ["Testing", /unit test|automated test|test automation|integration test|pytest|test infrastructure/i, 4, 0.8], ["Debugging", /debug|troubleshoot|root.cause/i, 4, 1],
+    ["Reliability/on-call", /on-?call|\bsla\b|incident response|high availability|site reliability/i, 3, 1], ["Monitoring", /monitoring|observab|alerting|telemetry/i, 3, 1],
+    ["Performance/cost", /performance|latency|scalab/i, 2, 1], ["Caching", /cach/i, 2, 0.8], ["AI agents/LLMs", /\bllm|agentic|ai agent|generative ai|\bgenai\b/i, 3, 0.8],
+    ["gRPC", /grpc|protobuf/i, 2, 0], ["Rust", /\brust\b/i, 2, 0], ["JavaScript/TypeScript", /javascript|typescript|react|node\.?js/i, 4, 0.3],
+    ["Layer 2/3 protocols", /layer ?2|layer ?3|\bbgp\b|ospf|vlan|vxlan|evpn|lacp|\bstp\b|mpls/i, 4, 0.1], ["Low-level hardware", /\bphys?\b|transceiver|optics|device driver|kernel|\bpcie\b|asic|fpga/i, 4, 0.1]
+  ];
+  var LIVE_KEY = SWE ? "radarLiveSwe" : "radarLive";
   var NAMES = {doordashusa: "DoorDash", scaleai: "Scale AI", openai: "OpenAI", sigmacomputing: "Sigma Computing", prizepicks: "PrizePicks", gitlab: "GitLab", mongodb: "MongoDB"};
   var MIN_SCORE = 40;
 
@@ -74,12 +95,12 @@
     var head = d.slice(0, 4000), m;
     RESIDE.lastIndex = 0;
     while ((m = RESIDE.exec(head))) { if (NONUS.test(m[1]) && !USPLACE.test(m[1])) return null; }
-    if (SKIP_TITLE.test(j.title)) return null;
+    if (SKIP_TITLE.test(j.title) || (SWE && DATA_FIRST.test(j.title))) return null;
     if (blocked(j.title, d)) return null;
     var text = j.title + " " + d, match = [], gap = [], tot = 0, got = 0;
     SK.forEach(function(s){ if (s[1].test(text)) { tot += s[2]; got += s[2] * s[3]; (s[3] >= 0.5 ? match : gap).push(s[0]); } });
     if (!tot) return null;
-    var sc = (0.55 * (got / tot) + 0.45 * Math.min(1, got / 45)) * 100;
+    var sc = (0.55 * (got / tot) + 0.45 * Math.min(1, got / (SWE ? 70 : 45))) * 100;  // software postings list more skills
     var yrs = []; var yr = /(\d{1,2})\s*\+\s*years/g, ym;
     while ((ym = yr.exec(d))) { var n = +ym[1]; if (n >= 1 && n <= 15) yrs.push(n); }
     var y = yrs.length ? Math.min.apply(null, yrs) : null, t = j.title;
@@ -89,8 +110,8 @@
     var lvl = /staff|principal|lead/i.test(t) ? "Staff+" : (/senior|sr\.?\b|\biii\b|\biv\b/i.test(t) ? "Senior" : "Mid");
     sc -= lvl === "Staff+" ? 25 : (lvl === "Senior" ? 5 : 0);
     sc -= (y && y >= 8) ? 15 : ((y && y >= 6) ? 6 : 0);
-    if (/bigquery/i.test(text)) sc += 6;
-    if (/data (engineer|infrastructure|platform)/i.test(t)) sc += 6;
+    if (SWE) { if (/software|backend|back-end|platform|infrastructure|systems|distributed/i.test(t)) sc += 6; }
+    else { if (/bigquery/i.test(text)) sc += 6; if (/data (engineer|infrastructure|platform)/i.test(t)) sc += 6; }
     var sal = j.comp || "";
     if (!sal) { var sm = SAL.exec(d); if (sm) sal = "$" + sm[1] + " – $" + sm[2]; }
     return {company: NAMES[j.company] || cap(j.company), title: t, loc: loc.split("•").join(";").slice(0, 90), url: j.url,
@@ -156,7 +177,7 @@
       out.sort(function(a, b){ return b.score - a.score; });
       if (!out.length) throw new Error("no matches");
       var added = out.filter(function(o){ return o.isNew; }).length;
-      try { localStorage.setItem("radarLive", JSON.stringify({at: Date.now(), jobs: out})); }
+      try { localStorage.setItem(LIVE_KEY, JSON.stringify({at: Date.now(), jobs: out})); }
       catch (e) { throw new Error("storage"); }
       msg.textContent = out.length + " roles, " + added + " new. Reloading…";
       setTimeout(function(){ location.reload(); }, 900);

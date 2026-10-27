@@ -1,5 +1,6 @@
-# Job Radar: pulls public job boards, scores roles against Nirav's resume,
-# and writes index.html (the dashboard) + jobs.json (used to flag new roles).
+# Job Radar: pulls public job boards once, scores roles against both of Nirav's resumes, and writes two dashboards:
+#   index.html + jobs.json          data engineering roles (Data Engineer resume)
+#   swe.html   + jobs_swe.json      software / systems engineering roles (Software Engineer resume)
 # Usage: python3 radar.py
 import json, re, html, os, sys, datetime, concurrent.futures as cf, urllib.request, urllib.parse
 
@@ -136,9 +137,15 @@ SR = """ServiceNow BoschGroup Canva Experian WesternDigital Freshworks AbbVie"""
 WD_TERMS = ["data engineer", "software engineer", "analytics engineer", "data platform"]
 
 UA = {'User-Agent': 'Mozilla/5.0'}
-TITLE = re.compile(r'data|analytics|etl|elt|pipeline|warehouse|lakehouse|business intelligence|\bbi\b|ml platform|ml infra|machine learning (platform|infra)|backend|back-end|software engineer|platform engineer|infrastructure engineer', re.I)
+# Titles for each dashboard. The job boards are read once with both lists combined (TITLE).
+TITLE_DE = re.compile(r'data|analytics|etl|elt|pipeline|warehouse|lakehouse|business intelligence|\bbi\b|ml platform|ml infra|machine learning (platform|infra)', re.I)
+TITLE_SWE = re.compile(r'software (?:engineer|developer|development engineer)|\bswe\b|\bsde\b|backend|back-end|platform engineer|infrastructure engineer|systems software|distributed systems|site reliability|\bsre\b|developer', re.I)
+DATA_FIRST = re.compile(r'data engineer|analytics engineer|\betl\b|business intelligence|\bbi\b|data analyst|data warehouse|analytics', re.I)  # these stay on the data page only
+TITLE = re.compile(TITLE_DE.pattern + '|' + TITLE_SWE.pattern, re.I)
 EXCL = re.compile(r'manager|director|head of|vp|principal|intern|scientist|(?<!data )(?<!intelligence )(?<!bi )(?<!analytics )analyst|sales|account|solutions|customer|support|recruit|counsel|marketing|product manager|designer', re.I)
 SKIP_TITLE = re.compile(r'product management|network|machine learning engineer|research engineer|field engineer|security|hardware|full-stack|frontend|embedded|firmware|flight software|avionics|datacenter|data center|consultant', re.I)
+# Software page: networking and systems software are in; front-end, mobile and hardware-only roles are out.
+SKIP_SWE = re.compile(r'product management|machine learning engineer|research engineer|field engineer|security|hardware|full[- ]?stack|front[- ]?end|\bios\b|android|mobile|embedded|firmware|flight software|avionics|datacenter|data center|consultant|salesforce|servicenow|\bsap\b|game|graphics', re.I)
 MIN_SCORE = 40  # roles below this fit score are dropped; the page has its own fit filter
 NAMES = {'doordashusa': 'DoorDash', 'scaleai': 'Scale AI', 'openai': 'OpenAI', 'sigmacomputing': 'Sigma Computing', 'prizepicks': 'PrizePicks', 'gitlab': 'GitLab', 'mongodb': 'MongoDB'}
 
@@ -257,7 +264,8 @@ def jooble():
     return out
 
 # Big tech career sites (public JSON behind their own search pages).
-BIG_TERMS = ["data engineer", "analytics engineer", "data platform", "software engineer data", "big data", "data analyst", "business intelligence"]
+BIG_TERMS = ["data engineer", "analytics engineer", "data platform", "software engineer data", "big data", "data analyst", "business intelligence",
+             "software engineer", "backend engineer", "distributed systems"]
 
 def amazon():
     out, seen = [], set()
@@ -288,7 +296,7 @@ def microsoft():
                 t = p.get("name", "")
                 if TITLE.search(t) and not EXCL.search(t) and any(x == "US" or x.endswith(", US") for x in (p.get("standardizedLocations") or [])): ids.setdefault(p["id"], p)
             if len(ps) < 10: break
-    for pid, p in list(ids.items())[:100]:
+    for pid, p in list(ids.items())[:160]:
         __import__("time").sleep(0.5)
         d = (retry(get, f"{base}/position_details?" + urllib.parse.urlencode({"position_id": pid, "domain": "microsoft.com", "hl": "en"})) or {}).get("data") or {}
         locs = "; ".join(p.get("locations") or [])
@@ -471,7 +479,7 @@ def meta():
             lines = [l.strip() for l in txt.split("\n") if l.strip() and l.strip() != "\u22c5"]
             t = lines[0] if lines else ""
             locs = [l for l in lines[1:] if USSTATE.search(l) or re.search(r"remote, us|united states", l, re.I)]
-            if t and locs and TITLE.search(t) and not EXCL.search(t) and not SKIP_TITLE.search(t): keep.append((h, t, locs))
+            if t and locs and TITLE.search(t) and not EXCL.search(t) and not (SKIP_TITLE.search(t) and SKIP_SWE.search(t)): keep.append((h, t, locs))
         for h, t, locs in keep[:80]:
             try:
                 pg.goto(h, wait_until="networkidle", timeout=45000); body = pg.inner_text("body")
@@ -598,6 +606,30 @@ SK = {
     'Databricks': (r'databricks|delta lake', 4, 0.1), 'Flink': (r'flink', 3, 0), 'AWS': (r'\baws\b|redshift|s3\b|glue|emr', 3, 0.2),
     'Scala/Java': (r'\bscala\b|\bjava\b', 3, 0.2), 'Go': (r'\bgolang\b|\bgo\b,', 2, 0), 'Terraform': (r'terraform', 2, 0.2), 'Dagster': (r'dagster', 2, 0.3),
 }
+# Software Engineer resume: (regex, weight, how much Nirav has it 0..1)
+SK_SWE = {
+    'Python': (r'python', 8, 1), 'C/C++': (r'\bc\+\+|\bc/c\+\+|\bc or c\+\+|\bc, c\+\+', 8, 0.7), 'Java': (r'\bjava\b', 4, 0.5), 'Go': (r'\bgolang\b|\bgo\b,|\bin go\b|\bgo\)', 5, 0),
+    'Distributed systems': (r'distributed system|high[- ]throughput|large[- ]scale (?:distributed|systems|services)', 8, 1), 'Linux': (r'linux|unix', 5, 1), 'REST APIs': (r'\brest\b|restful|microservice', 3, 1),
+    'System design': (r'system design|design doc|architect(?:ed|ing)? (?:and|scalable|systems|services)', 3, 1), 'SQL': (r'\bsql\b', 4, 1), 'GCP': (r'\bgcp\b|google cloud', 5, 1), 'AWS': (r'\baws\b|\bec2\b|\bs3\b|lambda', 4, 0.3),
+    'Azure': (r'azure', 2, 0.5), 'Kubernetes/Docker': (r'kubernetes|\bk8s\b|docker|container', 5, 0.8), 'CI/CD': (r'ci/cd|jenkins|github actions|continuous (integration|delivery)', 4, 0.8),
+    'Terraform/IaC': (r'terraform|infrastructure as code', 2, 0.6), 'Streaming (Kafka/Pub/Sub)': (r'kafka|pub/?sub|kinesis|streaming|event[- ]driven', 5, 1),
+    'Data processing (Spark/Beam)': (r'spark|apache beam|dataflow|hadoop', 3, 0.8), 'Airflow': (r'airflow', 2, 1), 'BigQuery': (r'bigquery', 3, 1),
+    'Concurrency': (r'multi-?thread|concurren|parallel', 4, 0.8), 'TCP/IP networking': (r'\btcp\b|\budp\b|socket|ip networking|networking protocol', 4, 0.7),
+    'Testing': (r'unit test|automated test|test automation|integration test|pytest|test infrastructure', 4, 0.8), 'Debugging': (r'debug|troubleshoot|root.cause', 4, 1),
+    'Reliability/on-call': (r'on-?call|\bsla\b|incident response|high availability|site reliability', 3, 1), 'Monitoring': (r'monitoring|observab|alerting|telemetry', 3, 1),
+    'Performance/cost': (r'performance|latency|scalab', 2, 1), 'Caching': (r'cach', 2, 0.8), 'AI agents/LLMs': (r'\bllm|agentic|ai agent|generative ai|\bgenai\b', 3, 0.8),
+    'gRPC': (r'grpc|protobuf', 2, 0), 'Rust': (r'\brust\b', 2, 0), 'JavaScript/TypeScript': (r'javascript|typescript|react|node\.?js', 4, 0.3),
+    'Layer 2/3 protocols': (r'layer ?2|layer ?3|\bbgp\b|ospf|vlan|vxlan|evpn|lacp|\bstp\b|mpls', 4, 0.1), 'Low-level hardware': (r'\bphys?\b|transceiver|optics|device driver|kernel|\bpcie\b|asic|fpga', 4, 0.1),
+}
+PROFILES = {
+    'de': dict(name='Data Engineer', sat=45, title=TITLE_DE, notitle=None, skip=SKIP_TITLE, sk=SK, json='jobs.json', html='index.html',
+               bonus=lambda t, text: (6 if re.search(r'bigquery', text, re.I) else 0) + (6 if re.search(r'data (engineer|infrastructure|platform)', t, re.I) else 0),
+               blurb="US data engineering and data platform roles pulled from company job boards and ranked against your Data Engineer resume: GCP, BigQuery, Airflow, SQL, Python, data quality and pipeline migrations."),
+    'swe': dict(name='Software Engineer', sat=70,  # software postings list more skills
+                title=TITLE_SWE, notitle=DATA_FIRST, skip=SKIP_SWE, sk=SK_SWE, json='jobs_swe.json', html='swe.html',
+                bonus=lambda t, text: 6 if re.search(r'software|backend|back-end|platform|infrastructure|systems|distributed', t, re.I) else 0,
+                blurb="US software, backend, platform and systems engineering roles pulled from company job boards and ranked against your Software Engineer resume: Python, C++, distributed systems, Linux, TCP/IP, Kubernetes and cloud."),
+}
 strip = lambda s: re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', html.unescape(s or '')))
 # Years of experience a posting asks for: every "5+ years", "3-5 years", "at least 4 years", "5 years of ... experience";
 # the highest one is the real bar (e.g. "7+ years overall, 3+ years with Spark" -> 7).
@@ -635,31 +667,31 @@ def blocked(title, d):
             return kind
     return ""
 
-def score(j):
+def score(j, prof=PROFILES['de']):
+    if not prof['title'].search(j['title']) or (prof['notitle'] and prof['notitle'].search(j['title'])): return None
     loc = j.get('loc') or ''
     d = strip(j.get('desc', ''))
     if NONUS.search(loc) and not USPLACE.search(loc): return None
     if not (USPLACE.search(loc) or USSTATE.search(loc)): return None
     for m in RESIDE.finditer(d[:4000]):  # e.g. 'open to candidates residing in Canada'
         if NONUS.search(m.group(1)) and not USPLACE.search(m.group(1)): return None
-    if SKIP_TITLE.search(j['title']): return None
+    if prof['skip'].search(j['title']): return None
     if blocked(j['title'], d): return None
     text = j['title'] + ' ' + d
     match, gap, tot, got = [], [], 0, 0
-    for k, (rx, w, h) in SK.items():
+    for k, (rx, w, h) in prof['sk'].items():
         if re.search(rx, text, re.I):
             tot += w; got += w * h
             (match if h >= 0.5 else gap).append(k)
     if tot == 0: return None
-    s = (0.55 * (got / tot) + 0.45 * min(1, got / 45)) * 100
+    s = (0.55 * (got / tot) + 0.45 * min(1, got / prof['sat'])) * 100
     yrs = [int(x) for x in re.findall(r'(\d{1,2})\s*\+\s*years', d) if 1 <= int(x) <= 15]
     y = min(yrs) if yrs else None
     t = j['title']
     lvl = 'Staff+' if re.search(r'staff|principal|lead', t, re.I) else 'Senior' if re.search(r'senior|sr\.?\b|\biii\b|\biv\b', t, re.I) else 'Mid'
     s -= 25 if lvl == 'Staff+' else 5 if lvl == 'Senior' else 0
     s -= 15 if (y and y >= 8) else 6 if (y and y >= 6) else 0
-    if re.search(r'bigquery', text, re.I): s += 6
-    if re.search(r'data (engineer|infrastructure|platform)', t, re.I): s += 6
+    s += prof['bonus'](t, text)
     sal = j.get('comp') or ''
     if not sal:
         m = SAL.search(d)
@@ -686,25 +718,37 @@ def main():
         if k not in direct: direct.add(k); raw.append(j)
     if not raw:
         sys.exit("No jobs fetched; keeping the previous dashboard.")
-    prev = set()
-    if os.path.exists(P('jobs.json')):
-        try: prev = {j['url'] for j in json.load(open(P('jobs.json')))}
-        except Exception: pass
-    seen, out = set(), []
-    for o in sorted(filter(None, map(score, raw)), key=lambda x: -x['score']):
-        k = (o['company'], o['title'], o['loc'])
-        if k in seen or o['score'] < MIN_SCORE: continue
-        seen.add(k)
-        o['isNew'] = bool(prev) and o['url'] not in prev
-        out.append(o)
-    json.dump(out, open(P('jobs.json'), 'w'), separators=(',', ':'))
     label = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-5))).strftime('%b %d, %Y').replace(' 0', ' ')
-    body = open(P('template.html')).read().replace('__DATA__', json.dumps(out, separators=(',', ':')).replace('</', '<\\/')).replace('__DATE__', label)
-    page = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
-            '<style>:root{color-scheme:light}body{margin:0;font:14px/1.5 system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>'
-            + body + '</body></html>')
-    open(P('index.html'), 'w').write(page)
-    print(f"{len(raw)} postings scanned, {len(out)} roles kept, {sum(o['isNew'] for o in out)} new")
+    tpl = open(P('template.html')).read()
+    for key, prof in PROFILES.items():
+        prev = set()
+        if os.path.exists(P(prof['json'])):
+            try: prev = {j['url'] for j in json.load(open(P(prof['json'])))}
+            except Exception: pass
+        seen, out = set(), []
+        for o in sorted(filter(None, (score(j, prof) for j in raw)), key=lambda x: -x['score']):
+            k = (o['company'], o['title'], o['loc'])
+            if k in seen or o['score'] < MIN_SCORE: continue
+            seen.add(k)
+            o['isNew'] = bool(prev) and o['url'] not in prev
+            out.append(o)
+        if not out:
+            print(prof['name'], "page: no roles matched; keeping the previous page."); continue
+        json.dump(out, open(P(prof['json']), 'w'), separators=(',', ':'))
+        other = PROFILES['swe' if key == 'de' else 'de']
+        nav = ('<nav class="pages" style="display:flex;gap:6px;margin:6px 0 4px;font-size:13px">' +
+               ''.join('<a href="%s" style="padding:4px 10px;border-radius:999px;text-decoration:none;%s">%s roles</a>' % (
+                   p['html'] if p['html'] != 'index.html' else './', 'background:var(--accent);color:var(--surface);font-weight:600' if p is prof else 'border:1px solid var(--line);color:var(--fg)', p['name'])
+                   for p in PROFILES.values()) + '</nav>')
+        body = (tpl.replace('__DATA__', json.dumps(out, separators=(',', ':')).replace('</', '<\\/')).replace('__DATE__', label)
+                .replace("<title>Nirav's Job Radar</title>", "<title>Nirav's Job Radar · %s</title>" % prof['name'])
+                .replace("<h1>Nirav's Job Radar</h1>", "<h1>Nirav's Job Radar</h1>" + nav))
+        body = re.sub(r'(<h1>.*?</nav>\s*<p>)[^<]*(</p>)', lambda m: m.group(1) + prof['blurb'] + m.group(2), body, count=1, flags=re.S)
+        page = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
+                '<style>:root{color-scheme:light}body{margin:0;font:14px/1.5 system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>'
+                + ('<script>window.PROFILE = "%s";</script>' % key) + body + '</body></html>')
+        open(P(prof['html']), 'w').write(page)
+        print(f"{prof['name']} page: {len(raw)} postings scanned, {len(out)} roles kept, {sum(o['isNew'] for o in out)} new")
 
 if __name__ == '__main__':
     main()
