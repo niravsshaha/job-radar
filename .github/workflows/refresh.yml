@@ -4,7 +4,7 @@ on:
     - cron: "0 12 * * *"   # 7:00 AM Central (12:00 UTC) every day
   workflow_dispatch: {}      # run it by hand from the Actions tab
   push:
-    paths: ["radar.py", "template.html"]
+    paths: ["radar.py", "template.html", "resumes.json"]
 concurrency:
   group: refresh
   cancel-in-progress: false
