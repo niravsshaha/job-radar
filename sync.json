@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-20T22:48:07.104Z",
+ "updated": "2026-11-20T22:48:18.629Z",
  "entries": {
   "a|https://boards.greenhouse.io/figma/jobs/5551686004?gh_jid=5551686004": {
    "v": true,
@@ -512,6 +512,14 @@
     "at": "2026-11-20T22:01:48.381Z"
    },
    "t": 1795212109864
+  },
+  "h|https://www.schwabjobs.com/job/southlake/data-engineer/33727/101625328992": {
+   "v": {
+    "reason": "Other",
+    "note": "rejected already",
+    "at": "2026-11-20T22:48:17.067Z"
+   },
+   "t": 1795214898628
   },
   "m|1792103598159": {
    "v": {
